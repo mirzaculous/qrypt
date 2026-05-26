@@ -6,1532 +6,200 @@
 <title>Qrypt — Pakistan's Smartest Ticketing System</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --green: #01f080;
-    --green-dim: #00b85f;
-    --green-glow: rgba(1,240,128,0.15);
-    --green-glow-strong: rgba(1,240,128,0.3);
-    --off-white: #f0f1f1;
-    --bg: #060a07;
-    --bg2: #0c110e;
-    --bg3: #101710;
-    --border: rgba(1,240,128,0.12);
-    --border-strong: rgba(1,240,128,0.3);
-    --text-muted: rgba(240,241,241,0.5);
-    --text-dim: rgba(240,241,241,0.75);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--off-white);
-    font-family: 'Space Grotesk', sans-serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
-
-  /* CUSTOM CURSOR */
-  .cursor {
-    width: 12px; height: 12px;
-    background: var(--green);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none;
-    z-index: 99999;
-    transition: transform 0.1s ease;
-    mix-blend-mode: screen;
-  }
-  .cursor-ring {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(1,240,128,0.4);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none;
-    z-index: 99998;
-    transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
-  }
-
-  /* LOADER */
-  #loader {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
-  }
-  #loader.hidden { opacity: 0; visibility: hidden; }
-
-  .qr-loader {
-    width: 120px; height: 120px;
-    position: relative;
-    animation: qr-spin 2s linear infinite;
-  }
-  @keyframes qr-spin {
-    0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
-    100% { transform: rotate(360deg); filter: hue-rotate(60deg); }
-  }
-
-  .qr-loader svg rect { fill: var(--green); }
-
-  .loader-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.3em;
-    color: var(--green);
-    text-transform: uppercase;
-    animation: pulse-text 1s ease-in-out infinite alternate;
-  }
-  @keyframes pulse-text {
-    from { opacity: 0.4; }
-    to { opacity: 1; }
-  }
-
-  .loader-bar {
-    width: 200px; height: 1px;
-    background: var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .loader-bar::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, var(--green), transparent);
-    animation: bar-slide 1.2s ease-in-out infinite;
-  }
-  @keyframes bar-slide {
-    to { left: 200%; }
-  }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 60px;
-    background: rgba(6,10,7,0.8);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--green);
-    letter-spacing: -0.02em;
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--off-white); }
-
-  .nav-links {
-    display: flex;
-    gap: 40px;
-    list-style: none;
-  }
-  .nav-links a {
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--green); }
-
-  .nav-cta {
-    background: var(--green);
-    color: var(--bg);
-    padding: 10px 24px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    transition: background 0.2s, transform 0.2s;
-  }
-  .nav-cta:hover { background: #00cc6a; transform: translateY(-1px); }
-
-  /* SECTIONS */
-  section { position: relative; }
-
-  /* HERO */
-  #hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 120px 40px 80px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-grid-bg {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(1,240,128,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(1,240,128,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%);
-  }
-
-  .hero-orb {
-    position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(1,240,128,0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(1,240,128,0.08);
-    border: 1px solid var(--border-strong);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    position: relative;
-  }
-  .badge-dot {
-    width: 6px; height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: blink 1.5s ease-in-out infinite;
-  }
-  @keyframes blink {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .hero-headline {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(52px, 8vw, 100px);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 24px;
-    position: relative;
-  }
-
-  .hero-headline .green { color: var(--green); }
-
-  .hero-sub {
-    font-size: clamp(16px, 2vw, 20px);
-    color: var(--text-muted);
-    max-width: 560px;
-    line-height: 1.6;
-    margin-bottom: 48px;
-    position: relative;
-  }
-
-  .hero-sub strong { color: var(--off-white); font-weight: 600; }
-
-  .hero-btns {
-    display: flex;
-    gap: 16px;
-    position: relative;
-  }
-
-  .btn-primary {
-    background: var(--green);
-    color: var(--bg);
-    padding: 16px 36px;
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    transition: all 0.2s;
-    border: none;
-    cursor: none;
-  }
-  .btn-primary:hover { background: #00e876; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(1,240,128,0.3); }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--off-white);
-    padding: 16px 36px;
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    letter-spacing: 0.02em;
-    border: 1px solid var(--border-strong);
-    transition: all 0.2s;
-    cursor: none;
-  }
-  .btn-ghost:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
-
-  .hero-stats {
-    display: flex;
-    gap: 60px;
-    margin-top: 80px;
-    position: relative;
-    padding-top: 40px;
-    border-top: 1px solid var(--border);
-  }
-
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 36px;
-    font-weight: 800;
-    color: var(--green);
-    display: block;
-  }
-  .stat-label {
-    font-size: 13px;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
-    margin-top: 4px;
-  }
-
-  /* SCROLLING TICKER */
-  .ticker-wrap {
-    overflow: hidden;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 0;
-    background: var(--bg2);
-  }
-  .ticker-track {
-    display: flex;
-    gap: 0;
-    animation: ticker-scroll 20s linear infinite;
-    width: max-content;
-  }
-  @keyframes ticker-scroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  .ticker-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 40px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-  .ticker-dot { color: var(--green); font-size: 18px; line-height: 1; }
-
-  /* WHAT IS QRYPT */
-  #what {
-    padding: 120px 60px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .section-tag {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 5vw, 64px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
-  }
-
-  .what-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-    margin-top: 60px;
-  }
-
-  .what-text p {
-    font-size: 17px;
-    line-height: 1.8;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-  }
-  .what-text p strong { color: var(--green); font-weight: 600; }
-
-  .what-visual {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .qr-demo {
-    width: 220px; height: 220px;
-    background: var(--bg3);
-    border: 1px solid var(--border-strong);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .qr-demo::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: conic-gradient(from 0deg, transparent, var(--green), transparent);
-    border-radius: 14px;
-    animation: qr-border-spin 3s linear infinite;
-    z-index: -1;
-  }
-  @keyframes qr-border-spin {
-    to { transform: rotate(360deg); }
-  }
-
-  .qr-code-inner {
-    animation: qr-rotate 3s ease-in-out infinite;
-  }
-  @keyframes qr-rotate {
-    0%,100% { opacity: 1; transform: scale(1); }
-    45% { opacity: 0; transform: scale(0.8); }
-    55% { opacity: 0; transform: scale(0.8); }
-  }
-
-  .countdown-ring {
-    position: absolute;
-    bottom: -20px; right: -20px;
-    width: 80px; height: 80px;
-    background: var(--bg2);
-    border: 1px solid var(--border-strong);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  .countdown-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--green);
-    line-height: 1;
-    animation: countdown 3s steps(3,end) infinite;
-  }
-  @keyframes countdown {
-    0% { content: '3'; }
-    33% { opacity: 0.4; }
-    66% { opacity: 0.2; }
-    100% { opacity: 1; }
-  }
-  .countdown-label {
-    font-size: 9px;
-    color: var(--text-muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .geo-badge {
-    position: absolute;
-    top: -16px; left: -20px;
-    background: var(--bg2);
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--green);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .geo-pulse {
-    width: 8px; height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: geo-ping 1.5s ease-out infinite;
-  }
-  @keyframes geo-ping {
-    0% { box-shadow: 0 0 0 0 var(--green-glow-strong); }
-    100% { box-shadow: 0 0 0 12px transparent; }
-  }
-
-  /* HOW IT WORKS */
-  #how {
-    padding: 120px 60px;
-    background: var(--bg2);
-    position: relative;
-    overflow: hidden;
-  }
-  #how::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--green), transparent);
-  }
-
-  .how-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .steps-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2px;
-    margin-top: 70px;
-    position: relative;
-  }
-
-  .step-card {
-    background: var(--bg3);
-    padding: 36px 28px;
-    position: relative;
-    border: 1px solid var(--border);
-    transition: border-color 0.3s, background 0.3s;
-    overflow: hidden;
-  }
-  .step-card:first-child { border-radius: 12px 0 0 12px; }
-  .step-card:last-child { border-radius: 0 12px 12px 0; }
-  .step-card:hover {
-    border-color: var(--border-strong);
-    background: rgba(1,240,128,0.03);
-  }
-  .step-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--green);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-    transform-origin: left;
-  }
-  .step-card:hover::after { transform: scaleX(1); }
-
-  .step-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 56px;
-    font-weight: 800;
-    color: rgba(1,240,128,0.08);
-    line-height: 1;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .step-icon {
-    width: 48px; height: 48px;
-    background: var(--green-glow);
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 20px;
-    font-size: 22px;
-  }
-
-  .step-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--off-white);
-  }
-
-  .step-desc {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text-muted);
-  }
-
-  /* FEATURES BENTO */
-  #features {
-    padding: 120px 60px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .bento-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto;
-    gap: 16px;
-    margin-top: 70px;
-  }
-
-  .bento-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 36px;
-    transition: border-color 0.3s, transform 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-  .bento-card:hover {
-    border-color: var(--border-strong);
-    transform: translateY(-4px);
-  }
-  .bento-card.wide { grid-column: span 2; }
-  .bento-card.tall { grid-row: span 2; }
-
-  .bento-icon {
-    font-size: 36px;
-    margin-bottom: 20px;
-    display: block;
-  }
-
-  .bento-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-  .bento-title .green { color: var(--green); }
-
-  .bento-desc {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text-muted);
-  }
-
-  .bento-bg-text {
-    position: absolute;
-    bottom: -20px; right: -10px;
-    font-family: 'Syne', sans-serif;
-    font-size: 100px;
-    font-weight: 800;
-    color: rgba(1,240,128,0.03);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  /* PRICING */
-  #pricing {
-    padding: 120px 60px;
-    background: var(--bg2);
-    position: relative;
-    overflow: hidden;
-  }
-  #pricing::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--green), transparent);
-  }
-
-  .pricing-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .pricing-hero {
-    margin-top: 60px;
-    background: var(--bg3);
-    border: 1px solid var(--border-strong);
-    border-radius: 24px;
-    padding: 60px;
-    position: relative;
-    overflow: hidden;
-  }
-  .pricing-hero::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(135deg, rgba(1,240,128,0.2), transparent 50%);
-    border-radius: 24px;
-    z-index: -1;
-  }
-
-  .pricing-badge {
-    display: inline-block;
-    background: rgba(1,240,128,0.1);
-    border: 1px solid var(--border-strong);
-    color: var(--green);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    border-radius: 100px;
-    margin-bottom: 32px;
-  }
-
-  .price-amount {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(72px, 12vw, 120px);
-    font-weight: 800;
-    color: var(--green);
-    line-height: 1;
-    letter-spacing: -0.04em;
-    margin-bottom: 8px;
-  }
-  .price-unit {
-    font-size: 20px;
-    color: var(--text-muted);
-    margin-bottom: 32px;
-    display: block;
-  }
-
-  .price-features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 48px;
-    padding-top: 48px;
-    border-top: 1px solid var(--border);
-    text-align: left;
-  }
-
-  .price-feat {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .price-feat-check {
-    width: 20px; height: 20px;
-    background: var(--green-glow);
-    border: 1px solid var(--border-strong);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    font-size: 11px;
-    color: var(--green);
-    margin-top: 2px;
-  }
-  .price-feat-text {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
-  .price-feat-text strong { color: var(--off-white); display: block; font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-
-  .pricing-cta {
-    margin-top: 48px;
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-  }
-
-  /* ABOUT */
-  #about {
-    padding: 120px 60px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-    margin-top: 60px;
-  }
-
-  .about-text p {
-    font-size: 17px;
-    line-height: 1.8;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-  }
-  .about-text p strong { color: var(--green); }
-
-  .about-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 32px;
-  }
-  .about-tag {
-    background: rgba(1,240,128,0.06);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .about-visual {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
-  }
-
-  .about-stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  .about-stat-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-  }
-  .about-stat-card .num {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--green);
-    display: block;
-  }
-  .about-stat-card .label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-
-  /* CONTACT */
-  #contact {
-    padding: 120px 60px;
-    background: var(--bg2);
-    position: relative;
-    overflow: hidden;
-  }
-  #contact::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--green), transparent);
-  }
-
-  .contact-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    margin-top: 60px;
-  }
-
-  .contact-info h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 16px;
-  }
-  .contact-info p {
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--text-muted);
-    margin-bottom: 32px;
-  }
-
-  .contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .contact-link {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    text-decoration: none;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-  .contact-link:hover {
-    border-color: var(--border-strong);
-    transform: translateX(4px);
-  }
-  .contact-link-icon {
-    width: 36px; height: 36px;
-    background: var(--green-glow);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    color: var(--green);
-    flex-shrink: 0;
-  }
-  .contact-link-text strong {
-    display: block;
-    color: var(--off-white);
-    font-size: 14px;
-    font-weight: 600;
-  }
-  .contact-link-text span {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .form-group label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    color: var(--off-white);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-    resize: none;
-  }
-  .form-group input:focus,
-  .form-group textarea:focus,
-  .form-group select:focus {
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px var(--green-glow);
-  }
-  .form-group input::placeholder,
-  .form-group textarea::placeholder { color: rgba(240,241,241,0.2); }
-  .form-group select option { background: var(--bg3); }
-
-  .form-submit {
-    background: var(--green);
-    color: var(--bg);
-    border: none;
-    padding: 16px 36px;
-    border-radius: 8px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: none;
-    transition: all 0.2s;
-    letter-spacing: 0.02em;
-    width: 100%;
-  }
-  .form-submit:hover { background: #00e876; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(1,240,128,0.3); }
-
-  /* FOOTER */
-  footer {
-    padding: 60px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .footer-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--green);
-  }
-
-  .footer-text {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .footer-text strong { color: var(--green); }
-
-  .footer-links {
-    display: flex;
-    gap: 24px;
-    list-style: none;
-  }
-  .footer-links a {
-    font-size: 13px;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--green); }
-
-  /* SCROLL REVEAL */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* ANIMATED LINE */
-  .line-accent {
-    width: 60px;
-    height: 3px;
-    background: var(--green);
-    border-radius: 2px;
-    margin-bottom: 24px;
-  }
-
-  /* ROTATING QR SVG */
-  .qr-svg { width: 160px; height: 160px; }
-
-</style>
-</head>
-<body>
-
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
-<!-- LOADER -->
-<div id="loader">
-  <div class="qr-loader">
-    <svg class="qr-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-      <!-- QR pattern -->
-      <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
-      <rect x="22" y="22" width="36" height="36" rx="3" fill="#01f080"/>
-      <rect x="90" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
-      <rect x="102" y="22" width="36" height="36" rx="3" fill="#01f080"/>
-      <rect x="10" y="90" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
-      <rect x="22" y="102" width="36" height="36" rx="3" fill="#01f080"/>
-      <!-- Data modules -->
-      <rect x="90" y="90" width="10" height="10" fill="#01f080"/>
-      <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
-      <rect x="120" y="90" width="10" height="10" fill="#01f080"/>
-      <rect x="135" y="90" width="15" height="10" fill="#01f080"/>
-      <rect x="90" y="105" width="10" height="10" fill="#01f080"/>
-      <rect x="120" y="105" width="10" height="10" fill="#01f080"/>
-      <rect x="90" y="120" width="25" height="10" fill="#01f080"/>
-      <rect x="120" y="120" width="10" height="10" fill="#01f080"/>
-      <rect x="135" y="120" width="15" height="10" fill="#01f080"/>
-      <rect x="105" y="135" width="10" height="10" fill="#01f080"/>
-      <rect x="120" y="135" width="30" height="10" fill="#01f080"/>
-      <!-- Finder dots -->
-      <rect x="30" y="30" width="20" height="20" fill="#060a07"/>
-      <rect x="110" y="30" width="20" height="20" fill="#060a07"/>
-      <rect x="30" y="110" width="20" height="20" fill="#060a07"/>
-    </svg>
-  </div>
-  <div class="loader-text">Initialising Qrypt</div>
-  <div class="loader-bar"></div>
-</div>
-
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Qrypt<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#what">What is Qrypt</a></li>
-    <li><a href="#how">How it works</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <a href="#contact" class="nav-cta">Get Early Access</a>
-</nav>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-grid-bg"></div>
-  <div class="hero-orb"></div>
-
-  <div class="hero-badge">
-    <div class="badge-dot"></div>
-    Pakistan's First Dynamic Ticketing System
-  </div>
-
-  <h1 class="hero-headline">
-    Screenshot<br>the ticket.<br>
-    <span class="green">We dare you.</span>
-  </h1>
-
-  <p class="hero-sub">
-    Qrypt generates <strong>rotating cryptographic QR codes</strong> that expire every 3 seconds and only work at your venue. Ticket fraud? Mathematically impossible.
-  </p>
-
-  <div class="hero-btns">
-    <a href="#contact" class="btn-primary">Book a Free Pilot →</a>
-    <a href="#how" class="btn-ghost">See How It Works</a>
-  </div>
-
-  <div class="hero-stats">
-    <div class="stat-item">
-      <span class="stat-num">3s</span>
-      <div class="stat-label">QR Rotation Speed</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">0</span>
-      <div class="stat-label">Fake Tickets Possible</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">Rs.10</span>
-      <div class="stat-label">Per Entry Only</div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">0%</span>
-      <div class="stat-label">Commission Charged</div>
-    </div>
-  </div>
-</section>
-
-<!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker-track">
-    <div class="ticker-item"><span class="ticker-dot">✦</span> No fake tickets</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Zero commission</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Rs. 10 per entry</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Location locked QR</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Real-time entry tracking</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Works on any phone</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> No app download needed</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Concerts • Events • University Fests</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> No fake tickets</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Zero commission</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Rs. 10 per entry</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Location locked QR</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Real-time entry tracking</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Works on any phone</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> No app download needed</div>
-    <div class="ticker-item"><span class="ticker-dot">✦</span> Concerts • Events • University Fests</div>
-  </div>
-</div>
-
-<!-- WHAT IS QRYPT -->
-<section id="what">
-  <div class="reveal">
-    <span class="section-tag">What is Qrypt</span>
-    <div class="line-accent"></div>
-    <h2 class="section-title">Ticketing built for<br>Pakistan's reality.</h2>
-  </div>
-
-  <div class="what-grid reveal">
-    <div class="what-text">
-      <p>Pakistan's event industry loses millions every year to <strong>duplicate tickets, screenshots, and counterfeits</strong>. The current systems — static QR codes, printed passes, clipboard guest lists — were never built for how we actually use our phones.</p>
-      <p>Qrypt is a <strong>web-based smart ticketing platform</strong> that makes every ticket unique to the buyer, tied to their location, and impossible to forward, duplicate, or fake. No expensive hardware. No app download. Just a phone browser.</p>
-      <p>We're starting with <strong>concerts, university fests, corporate events, and functions</strong> across Karachi, Lahore, and Islamabad — and we're charging a fraction of what existing platforms take.</p>
-    </div>
-    <div class="what-visual">
-      <div class="qr-demo">
-        <div class="qr-code-inner">
-          <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-            <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
-            <rect x="20" y="20" width="30" height="30" rx="2" fill="#01f080"/>
-            <rect x="100" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
-            <rect x="110" y="20" width="30" height="30" rx="2" fill="#01f080"/>
-            <rect x="10" y="100" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
-            <rect x="20" y="110" width="30" height="30" rx="2" fill="#01f080"/>
-            <rect x="75" y="75" width="10" height="10" fill="#01f080"/>
-            <rect x="90" y="75" width="10" height="10" fill="#01f080"/>
-            <rect x="105" y="75" width="10" height="10" fill="#01f080"/>
-            <rect x="120" y="75" width="10" height="10" fill="#01f080"/>
-            <rect x="135" y="75" width="15" height="10" fill="#01f080"/>
-            <rect x="75" y="90" width="10" height="10" fill="#01f080"/>
-            <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
-            <rect x="75" y="105" width="25" height="10" fill="#01f080"/>
-            <rect x="105" y="105" width="10" height="10" fill="#01f080"/>
-            <rect x="120" y="105" width="30" height="10" fill="#01f080"/>
-            <rect x="90" y="120" width="10" height="10" fill="#01f080"/>
-            <rect x="105" y="120" width="45" height="10" fill="#01f080"/>
-            <rect x="27" y="27" width="16" height="16" fill="#060a07"/>
-            <rect x="117" y="27" width="16" height="16" fill="#060a07"/>
-            <rect x="27" y="117" width="16" height="16" fill="#060a07"/>
-          </svg>
-        </div>
-      </div>
-      <div class="geo-badge">
-        <div class="geo-pulse"></div>
-        In Range — Verified
-      </div>
-      <div class="countdown-ring">
-        <div class="countdown-num" id="countdown-num">3</div>
-        <div class="countdown-label">secs</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div class="how-inner">
-    <div class="reveal">
-      <span class="section-tag">How it works</span>
-      <div class="line-accent"></div>
-      <h2 class="section-title">Four steps.<br>Zero fraud.</h2>
-    </div>
-
-    <div class="steps-grid reveal">
-      <div class="step-card">
-        <span class="step-num">01</span>
-        <div class="step-icon">🎟️</div>
-        <div class="step-title">Organiser creates event</div>
-        <p class="step-desc">Set up your event in minutes. Define capacity, set a geofence boundary around your venue, and generate your unique event link. No hardware required.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">02</span>
-        <div class="step-icon">📲</div>
-        <div class="step-title">Attendee buys ticket</div>
-        <p class="step-desc">Buyer pays online and receives a personal ticket link. No app download. The ticket lives in their phone browser, tied cryptographically to their account.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">03</span>
-        <div class="step-icon">📍</div>
-        <div class="step-title">Location gets verified</div>
-        <p class="step-desc">When the attendee opens their ticket at the venue, Qrypt checks their GPS location against your geofence. Inside boundary? The live QR activates.</p>
-      </div>
-      <div class="step-card">
-        <span class="step-num">04</span>
-        <div class="step-icon">🔐</div>
-        <div class="step-title">QR rotates every 3 seconds</div>
-        <p class="step-desc">The QR code changes cryptographically every 3 seconds. Scanner at the gate reads it instantly. Screenshot it, forward it, fake it — all invalid. Entry granted. Fraud blocked.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="reveal">
-    <span class="section-tag">Features</span>
-    <div class="line-accent"></div>
-    <h2 class="section-title">Built different.<br><span style="color:var(--green)">Not just different looking.</span></h2>
-  </div>
-
-  <div class="bento-grid reveal">
-    <div class="bento-card wide">
-      <span class="bento-icon">🔄</span>
-      <div class="bento-title">Rotating <span class="green">Cryptographic</span> QR</div>
-      <p class="bento-desc">Powered by TOTP-grade cryptography — the same algorithm behind Google Authenticator. Every code is mathematically unique, time-bound, and tied to a single person's device. Screenshot it. It's already expired.</p>
-      <div class="bento-bg-text">QR</div>
-    </div>
-    <div class="bento-card">
-      <span class="bento-icon">📍</span>
-      <div class="bento-title"><span class="green">Geofenced</span> Activation</div>
-      <p class="bento-desc">Ticket only goes live when the attendee is physically at your venue. GPS + Wi-Fi fingerprinting for maximum accuracy indoors.</p>
-    </div>
-    <div class="bento-card">
-      <span class="bento-icon">📊</span>
-      <div class="bento-title">Live Entry <span class="green">Dashboard</span></div>
-      <p class="bento-desc">Watch who's entering in real time. Capacity alerts, entry heatmaps, and a full post-event attendance report.</p>
-    </div>
-    <div class="bento-card">
-      <span class="bento-icon">📱</span>
-      <div class="bento-title">No App. <span class="green">No Hardware.</span></div>
-      <p class="bento-desc">Attendees use their phone browser. Your gate staff uses any phone camera to scan. Zero setup costs.</p>
-    </div>
-    <div class="bento-card wide">
-      <span class="bento-icon">⚡</span>
-      <div class="bento-title">Multiple <span class="green">Gate Scanners</span></div>
-      <p class="bento-desc">Run 10 entry points simultaneously from different phones. All synced in real time. No more queues, no more chaos at the gate. Each scan is validated centrally in milliseconds — works even with intermittent venue Wi-Fi.</p>
-      <div class="bento-bg-text">⚡</div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section id="pricing">
-  <div class="pricing-inner">
-    <div class="reveal">
-      <span class="section-tag">Pricing</span>
-      <div class="line-accent" style="margin: 0 auto 24px;"></div>
-      <h2 class="section-title">No commission.<br>No hidden costs.<br><span style="color:var(--green)">Just Rs. 10 per entry.</span></h2>
-      <p style="color:var(--text-muted); font-size:17px; margin-top:20px; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.7;">
-        Ticketwala takes a cut of every ticket sold. We don't.<br>You pay only when someone walks through the door.
-      </p>
-    </div>
-
-    <div class="pricing-hero reveal">
-      <div class="pricing-badge">Pay As You Go — No Subscription</div>
-      <div class="price-amount">₨10</div>
-      <span class="price-unit">per verified entry · that's it · nothing else</span>
-
-      <div class="price-features">
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>Zero Commission</strong>Sell tickets at any price. We take Rs.10 per scan, not a % of your revenue.</div>
-        </div>
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>No Setup Fee</strong>Create your event, set your boundary, go live. Free to set up.</div>
-        </div>
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>No Hidden Costs</strong>No monthly fee. No platform charge. No per-event charge. Just Rs.10 per real entry.</div>
-        </div>
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>Unlimited Events</strong>Run as many events as you want. Scale from a 50-person open mic to a 5000-person concert.</div>
-        </div>
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>Real-Time Dashboard</strong>Full entry analytics included for every event at no extra cost.</div>
-        </div>
-        <div class="price-feat">
-          <div class="price-feat-check">✓</div>
-          <div class="price-feat-text"><strong>First Pilot Free</strong>We'll run your first event completely free. No strings attached.</div>
-        </div>
-      </div>
-
-      <div class="pricing-cta">
-        <a href="#contact" class="btn-primary">Start for Free →</a>
-        <a href="#contact" class="btn-ghost">Talk to Us First</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="reveal">
-    <span class="section-tag">About Qrypt</span>
-    <div class="line-accent"></div>
-    <h2 class="section-title">Built in Pakistan.<br>For Pakistan.</h2>
-  </div>
-
-  <div class="about-grid reveal">
-    <div class="about-text">
-      <p>We went to a concert in Karachi and watched three different people walk in with the same screenshotted ticket. The guy at the door had no idea. <strong>That's not a people problem. That's a technology problem.</strong></p>
-      <p>Pakistan has incredible events — underground music nights, massive university fests, comedy shows, food festivals. The culture is there. The audience is there. But the infrastructure is stuck in 2012.</p>
-      <p>We're a team of builders who are <strong>tired of watching event organizers lose money</strong> to broken systems. Qrypt is the platform we wished existed.</p>
-      <p>We're starting in Karachi and Lahore, running our first pilots with university societies and independent event organizers. If you want to be among the first — <strong>DMs are open.</strong></p>
-
-      <div class="about-tags">
-        <span class="about-tag">🇵🇰 Made in Pakistan</span>
-        <span class="about-tag">🎵 Concerts & Music</span>
-        <span class="about-tag">🎓 University Events</span>
-        <span class="about-tag">🎤 Comedy Nights</span>
-        <span class="about-tag">🍴 Food Festivals</span>
-        <span class="about-tag">🏢 Corporate Functions</span>
-      </div>
-    </div>
-    <div class="about-visual">
-      <div class="about-stat-grid">
-        <div class="about-stat-card">
-          <span class="num">0%</span>
-          <div class="label">Commission on ticket sales</div>
-        </div>
-        <div class="about-stat-card">
-          <span class="num">3s</span>
-          <div class="label">QR code rotation speed</div>
-        </div>
-        <div class="about-stat-card">
-          <span class="num">∞</span>
-          <div class="label">Events you can create</div>
-        </div>
-        <div class="about-stat-card">
-          <span class="num">Rs.10</span>
-          <div class="label">Total cost per real entry</div>
-        </div>
-      </div>
-      <div style="margin-top:20px; padding:24px; background:var(--bg3); border:1px solid var(--border); border-radius:12px;">
-        <p style="font-size:13px; color:var(--text-muted); line-height:1.7; font-style:italic;">"Your event deserves better than a clipboard and a prayer. We built the system that makes ticket fraud mathematically impossible — no expensive hardware, no app downloads, just a smarter way to run events in Pakistan."</p>
-        <p style="font-size:13px; color:var(--green); margin-top:12px; font-weight:600;">— Qrypt Team, Karachi 🇵🇰</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="contact-inner">
-    <div class="reveal">
-      <span class="section-tag">Contact Us</span>
-      <div class="line-accent"></div>
-      <h2 class="section-title">Ready to run<br><span style="color:var(--green)">your first Qrypt event?</span></h2>
-      <p style="color:var(--text-muted); font-size:17px; margin-top:16px; line-height:1.7; max-width:500px;">First pilot is on us — completely free. Let's run your next event together and show you what zero fraud feels like.</p>
-    </div>
-
-    <div class="contact-grid reveal">
-      <div class="contact-info">
-        <h3>Let's talk.</h3>
-        <p>We're actively onboarding event organizers in Karachi, Lahore, and Islamabad. Whether you run weekly open mics or large-scale concerts — we want to hear from you.</p>
-
-        <div class="contact-links">
-          <a href="mailto:hello@qrypt.pk" class="contact-link">
-            <div class="contact-link-icon">✉</div>
-            <div class="contact-link-text">
-              <strong>Email us</strong>
-              <span>hello@qrypt.pk</span>
-            </div>
-          </a>
-          <a href="https://instagram.com/qryptpk" class="contact-link">
-            <div class="contact-link-icon">📸</div>
-            <div class="contact-link-text">
-              <strong>Instagram</strong>
-              <span>@qryptpk</span>
-            </div>
-          </a>
-          <a href="https://linkedin.com/company/qrypt" class="contact-link">
-            <div class="contact-link-icon">💼</div>
-            <div class="contact-link-text">
-              <strong>LinkedIn</strong>
-              <span>Qrypt Pakistan</span>
-            </div>
-          </a>
-          <a href="#" class="contact-link">
-            <div class="contact-link-icon">📍</div>
-            <div class="contact-link-text">
-              <strong>Based in</strong>
-              <span>Karachi, Pakistan 🇵🇰</span>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div class="contact-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Your Name</label>
-            <input type="text" placeholder="Ahmed Khan" />
-          </div>
-          <div class="form-group">
-            <label>Phone / WhatsApp</label>
-            <input type="text" placeholder="+92 300 0000000" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" placeholder="you@email.com" />
-        </div>
-        <div class="form-group">
-          <label>Event Type</label>
-          <select>
-            <option value="">Select your event type</option>
-            <option>Concert / Music Event</option>
-            <option>University Fest</option>
-            <option>Comedy Night / Open Mic</option>
-            <option>Corporate Function</option>
-            <option>Food Festival</option>
-            <option>Sports Event</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Tell us about your event</label>
-          <textarea rows="4" placeholder="Rough size, location, when it's happening — anything helps us prepare..."></textarea>
-        </div>
-        <button class="form-submit" onclick="handleSubmit(this)">Book Free Pilot →</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">Qrypt.</div>
-  <div class="footer-text">Built in <strong>Pakistan 🇵🇰</strong> · Screenshot the ticket. We dare you. 🔐</div>
-  <ul class="footer-links">
-    <li><a href="#what">What is Qrypt</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</footer>
-
-<script>
-  // CURSOR
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
-  });
-
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  document.querySelectorAll('a, button, .step-card, .bento-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform += ' scale(2)';
-      ring.style.width = '60px';
-      ring.style.height = '60px';
-    });
-    el.addEventListener('mouseleave', () => {
-      ring.style.width = '36px';
-      ring.style.height = '36px';
-    });
-  });
-
-  // LOADER
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.getElementById('loader').classList.add('hidden');
-    }, 2200);
-  });
-
-  // COUNTDOWN
-  let count = 3;
-  const countEl = document.getElementById('countdown-num');
-  setInterval(() => {
-    count--;
-    if (count < 1) count = 3;
-    if (countEl) countEl.textContent = count;
-  }, 1000);
-
-  // SCROLL REVEAL
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 100);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
-
-  // FORM SUBMIT
-  function handleSubmit(btn) {
-    btn.textContent = 'Sent! We\'ll be in touch 🔐';
-    btn.style.background = '#00b85f';
-    btn.disabled = true;
-  }
-
-  // NAV SCROLL EFFECT
-  window.addEventListener('scroll', () => {
-    const nav = document.querySelector('nav');
-    if (window.scrollY > 60) {
-      nav.style.padding = '14px 60px';
-    } else {
-      nav.style.padding = '20px 60px';
-    }
-  });
-</script>
-</body>
-</html>
+:root{--green:#01f080;--green-dim:#00b85f;--green-glow:rgba(1,240,128,0.15);--green-glow-strong:rgba(1,240,128,0.3);--off-white:#f0f1f1;--bg:#060a07;--bg2:#0c110e;--bg3:#101710;--border:rgba(1,240,128,0.12);--border-strong:rgba(1,240,128,0.3);--text-muted:rgba(240,241,241,0.5);--text-dim:rgba(240,241,241,0.75)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--off-white);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity 0.8s ease,visibility 0.8s ease}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.qr-loader{width:100px;height:100px;animation:qr-spin 2s linear infinite}
+@keyframes qr-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.loader-text{font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.3em;color:var(--green);text-transform:uppercase;animation:pulse-text 1s ease-in-out infinite alternate}
+@keyframes pulse-text{from{opacity:0.4}to{opacity:1}}
+.loader-bar{width:180px;height:1px;background:var(--border);position:relative;overflow:hidden}
+.loader-bar::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--green),transparent);animation:bar-slide 1.2s ease-in-out infinite}
+@keyframes bar-slide{to{left:200%}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(6,10,7,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:padding 0.3s}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);letter-spacing:-0.02em;text-decoration:none}
+.nav-logo span{color:var(--off-white)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:var(--text-dim);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--green)}
+.nav-cta{background:var(--green);color:var(--bg);padding:10px 22px;border-radius:4px;font-size:13px;font-weight:700;text-decoration:none;transition:background 0.2s,transform 0.2s;white-space:nowrap}
+.nav-cta:hover{background:#00cc6a;transform:translateY(-1px)}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--off-white);border-radius:2px;transition:all 0.3s}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--off-white);text-decoration:none;transition:color 0.2s}
+.mobile-menu a:hover{color:var(--green)}
+.mobile-close{position:absolute;top:24px;right:24px;font-size:28px;color:var(--text-muted);cursor:pointer;background:none;border:none}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(1,240,128,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(1,240,128,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black 40%,transparent 100%)}
+.hero-orb{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(1,240,128,0.07) 0%,transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(1,240,128,0.08);border:1px solid var(--border-strong);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:600;color:var(--green);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:28px;position:relative}
+.badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero-headline{font-family:'Syne',sans-serif;font-size:clamp(42px,8vw,96px);font-weight:800;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;position:relative}
+.hero-headline .green{color:var(--green)}
+.hero-sub{font-size:clamp(15px,2vw,19px);color:var(--text-muted);max-width:540px;line-height:1.6;margin-bottom:40px;position:relative}
+.hero-sub strong{color:var(--off-white);font-weight:600}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative}
+.btn-primary{background:var(--green);color:var(--bg);padding:15px 32px;border-radius:4px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.2s;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-primary:hover{background:#00e876;transform:translateY(-2px);box-shadow:0 8px 30px rgba(1,240,128,0.3)}
+.btn-ghost{background:transparent;color:var(--off-white);padding:15px 32px;border-radius:4px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid var(--border-strong);transition:all 0.2s}
+.btn-ghost:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:40px;margin-top:60px;position:relative;padding-top:40px;border-top:1px solid var(--border);flex-wrap:wrap;justify-content:center}
+.stat-item{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,36px);font-weight:800;color:var(--green);display:block}
+.stat-label{font-size:12px;color:var(--text-muted);letter-spacing:0.04em;margin-top:4px}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;background:var(--bg2)}
+.ticker-track{display:flex;animation:ticker-scroll 22s linear infinite;width:max-content}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:flex;align-items:center;gap:14px;padding:0 32px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap}
+.ticker-dot{color:var(--green);font-size:16px}
+
+/* SECTION BASE */
+.section-tag{font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,60px);font-weight:800;line-height:1.05;letter-spacing:-0.02em;margin-bottom:20px}
+.line-accent{width:50px;height:3px;background:var(--green);border-radius:2px;margin-bottom:20px}
+
+/* WHAT */
+#what{padding:100px 40px;max-width:1200px;margin:0 auto}
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-top:50px}
+.what-text p{font-size:16px;line-height:1.8;color:var(--text-dim);margin-bottom:18px}
+.what-text p strong{color:var(--green);font-weight:600}
+.what-visual{display:flex;align-items:center;justify-content:center;position:relative;min-height:280px}
+.qr-demo{width:200px;height:200px;background:var(--bg3);border:1px solid var(--border-strong);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.qr-demo::before{content:'';position:absolute;inset:-2px;background:conic-gradient(from 0deg,transparent,var(--green),transparent);border-radius:14px;animation:qr-border-spin 3s linear infinite;z-index:-1}
+@keyframes qr-border-spin{to{transform:rotate(360deg)}}
+.qr-code-inner{animation:qr-fade 3s ease-in-out infinite}
+@keyframes qr-fade{0%,100%{opacity:1;transform:scale(1)}45%{opacity:0;transform:scale(0.85)}55%{opacity:0;transform:scale(0.85)}}
+.countdown-ring{position:absolute;bottom:-20px;right:-16px;width:72px;height:72px;background:var(--bg2);border:1px solid var(--border-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.countdown-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--green);line-height:1}
+.countdown-label{font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase}
+.geo-badge{position:absolute;top:-14px;left:-16px;background:var(--bg2);border:1px solid var(--border-strong);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:6px}
+.geo-pulse{width:7px;height:7px;background:var(--green);border-radius:50%;animation:geo-ping 1.5s ease-out infinite}
+@keyframes geo-ping{0%{box-shadow:0 0 0 0 var(--green-glow-strong)}100%{box-shadow:0 0 0 10px transparent}}
+
+/* HOW */
+#how{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#how::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.how-inner{max-width:1200px;margin:0 auto}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:60px}
+.step-card{background:var(--bg3);padding:30px 24px;position:relative;border:1px solid var(--border);transition:border-color 0.3s,background 0.3s;overflow:hidden}
+.step-card:first-child{border-radius:12px 0 0 12px}
+.step-card:last-child{border-radius:0 12px 12px 0}
+.step-card:hover{border-color:var(--border-strong);background:rgba(1,240,128,0.03)}
+.step-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transition:transform 0.3s;transform-origin:left}
+.step-card:hover::after{transform:scaleX(1)}
+.step-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:rgba(1,240,128,0.07);line-height:1;margin-bottom:14px;display:block}
+.step-icon{width:44px;height:44px;background:var(--green-glow);border:1px solid var(--border-strong);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px}
+.step-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:10px;color:var(--off-white)}
+.step-desc{font-size:13px;line-height:1.7;color:var(--text-muted)}
+
+/* FEATURES */
+#features{padding:100px 40px;max-width:1200px;margin:0 auto}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:60px}
+.bento-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;transition:border-color 0.3s,transform 0.3s;position:relative;overflow:hidden}
+.bento-card:hover{border-color:var(--border-strong);transform:translateY(-4px)}
+.bento-card.wide{grid-column:span 2}
+.bento-icon{font-size:32px;margin-bottom:16px;display:block}
+.bento-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.bento-title .green{color:var(--green)}
+.bento-desc{font-size:13px;line-height:1.7;color:var(--text-muted)}
+.bento-bg-text{position:absolute;bottom:-16px;right:-8px;font-family:'Syne',sans-serif;font-size:80px;font-weight:800;color:rgba(1,240,128,0.03);line-height:1;pointer-events:none;user-select:none}
+
+/* PRICING */
+#pricing{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#pricing::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.pricing-inner{max-width:960px;margin:0 auto;text-align:center}
+.pricing-hero{margin-top:50px;background:var(--bg3);border:1px solid var(--border-strong);border-radius:24px;padding:50px 40px;position:relative;overflow:hidden}
+.pricing-badge{display:inline-block;background:rgba(1,240,128,0.1);border:1px solid var(--border-strong);color:var(--green);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:28px}
+.price-amount{font-family:'Syne',sans-serif;font-size:clamp(64px,12vw,110px);font-weight:800;color:var(--green);line-height:1;letter-spacing:-0.04em;margin-bottom:8px}
+.price-unit{font-size:17px;color:var(--text-muted);margin-bottom:28px;display:block}
+.price-features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;padding-top:40px;border-top:1px solid var(--border);text-align:left}
+.price-feat{display:flex;align-items:flex-start;gap:10px}
+.price-feat-check{width:20px;height:20px;background:var(--green-glow);border:1px solid var(--border-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--green);margin-top:2px}
+.price-feat-text{font-size:13px;color:var(--text-dim);line-height:1.5}
+.price-feat-text strong{color:var(--off-white);display:block;font-weight:600;font-size:14px;margin-bottom:2px}
+.pricing-cta{margin-top:40px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ABOUT */
+#about{padding:100px 40px;max-width:1200px;margin:0 auto}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-top:50px}
+.about-text p{font-size:16px;line-height:1.8;color:var(--text-dim);margin-bottom:18px}
+.about-text p strong{color:var(--green)}
+.about-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.about-tag{background:rgba(1,240,128,0.06);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500}
+.about-visual{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px}
+.about-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.about-stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:22px}
+.about-stat-card .num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--green);display:block}
+.about-stat-card .label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.about-quote{margin-top:16px;padding:22px;background:var(--bg3);border:1px solid var(--border);border-radius:12px}
+.about-quote p{font-size:13px;color:var(--text-muted);line-height:1.7;font-style:italic}
+.about-quote .author{font-size:13px;color:var(--green);margin-top:10px;font-weight:600}
+
+/* CONTACT */
+#contact{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#contact::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.contact-inner{max-width:1000px;margin:0 auto}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:50px}
+.contact-info h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:14px}
+.contact-info p{font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:28px}
+.contact-links{display:flex;flex-direction:column;gap:12px}
+.contact-link{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.contact-link:hover{border-color:var(--border-strong);transform:translateX(4px)}
+.contact-link-icon{width:34px;height:34px;background:var(--green-glow);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green);flex-shrink:0}
+.contact-link-text strong{display:block;color:var(--off-white);font-size:13px;font-weight:600}
+.contact-link-text span{font-size:12px;color:var(--text-muted)}
+.contact-form{display:flex;flex-direction:column;gap:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted)}
+.form-group input,.form-group textarea,.form-group select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:13px 14px;color:var(--off-white);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;resize:none;-webkit-appearance:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--border-strong);box-shadow:0 0 0 3px var(--green-glow)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(240,241,241,0.2)}
+.form-group select option{background:var(--bg3);color:var(--off-white)}
+.form-submit{background:var(--green);color:var(--bg);border:none;padding:15px 32px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;width:100%;letter-spacing:0.02em}
+.form-submit:hover{background:#00e876;transform:translateY(-2px);box-shadow:0 8px 30px rgba(1,240,128,0.3)}
+.form-submit:disabled{opacity:0.7;cursor:not-allowed;transform:none}
+.form-msg{text-align:center;font-size:14px;padding:12px;border-radius:8px;display:none}
+.form-msg.success{display:block;background:rgba(1,240,128,0.1);border:1px solid var(--border-strong);color:var(--green)}
+.form-msg.error{display:block;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);color:#ff8080}
+
+/* BIG FOOTER */
+.footer-main{background:var(--bg);border-top:1px solid var(--border);padding:80px 40px 40px}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:50px;padding-bottom:60px;border-bottom:1px solid var(--border)}
+.footer-brand .logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-bottom:14px;display:block}
+.footer-brand p{font-size:13px;color:var(--text-muted);line-height:1.7;max-width:260px;margin-bottom:20px}
+.footer-social{display:flex;gap:10px}
+.social-btn{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.social-btn:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.footer-col h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--off-white);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul a{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+.footer-col ul a:hover{color:var(--green)}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:32px;flex-wrap:wrap;gap:16px}
+.footer-bottom p{font-size:12px;color:var(--text-muted)}
+.footer-bottom p strong{color:var(--green)}
+.footer-bottom-links{display:flex;gap:20px;list-style:none}
+.footer-bottom-links a{font-size:12px;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+.footer-bottom-links a:hover{color:var(--green)}
+
+/* WHATSAPP FLOAT */
+.wa-float{position:fixed;bottom:28px;right:28px;z-index:998;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.wa-bubble{background:#25D366;border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(37,211,102,0.4);cursor:pointer;text-decoration:none;animation:wa-bounce 3s ease-in-out infinite;transition:transform 0.2s,box-shadow 0.2s}
+.wa-bubble:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(37,211,102,0.6);animation:none}
+@keyframes wa-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.wa-bubble svg{width:30px;height:30px;fill:#fff}
+.wa-tooltip{background:var(--bg2);border:1px solid var(--border-strong);color:var(--off-white);font-si
