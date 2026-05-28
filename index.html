@@ -202,4 +202,538 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:ce
 .wa-bubble:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(37,211,102,0.6);animation:none}
 @keyframes wa-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .wa-bubble svg{width:30px;height:30px;fill:#fff}
-.wa-tooltip{background:var(--bg2);border:1px solid var(--border-strong);color:var(--off-white);font-si
+.wa-tooltip{background:var(--bg2);border:1px solid var(--border-strong);color:var(--off-white);font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;white-space:nowrap;display:flex;align-items:center;gap:6px;animation:wa-fade-in 0.3s ease;pointer-events:none}
+.wa-online-dot{width:7px;height:7px;background:#25D366;border-radius:50%;animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes wa-fade-in{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:14px 20px}
+  .nav-links,.nav-cta{display:none}
+  .nav-hamburger{display:flex}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .step-card:first-child{border-radius:12px 0 0 0}
+  .step-card:last-child{border-radius:0 0 12px 0}
+  .step-card:nth-child(2){border-radius:0 12px 0 0}
+  .step-card:nth-child(3){border-radius:0 0 0 12px}
+  .bento-grid{grid-template-columns:1fr 1fr}
+  .bento-card.wide{grid-column:span 2}
+  .what-grid,.about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .what-visual{min-height:200px}
+  .price-features{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .hero-stats{gap:24px}
+}
+@media(max-width:600px){
+  #hero{padding:100px 20px 60px}
+  #what,#features,#about,#contact,#pricing{padding:70px 20px}
+  #how{padding:70px 20px}
+  .steps-grid{grid-template-columns:1fr;gap:2px}
+  .step-card:first-child{border-radius:12px 12px 0 0}
+  .step-card:last-child{border-radius:0 0 12px 12px}
+  .step-card:nth-child(2){border-radius:0}
+  .step-card:nth-child(3){border-radius:0}
+  .bento-grid{grid-template-columns:1fr}
+  .bento-card.wide{grid-column:span 1}
+  .price-features{grid-template-columns:1fr}
+  .pricing-hero{padding:32px 24px}
+  .form-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .footer-main{padding:50px 20px 32px}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:12px}
+  .wa-float{bottom:20px;right:20px}
+  .wa-bubble{width:52px;height:52px}
+  .hero-btns{flex-direction:column;align-items:center}
+  .btn-primary,.btn-ghost{width:100%;max-width:300px;text-align:center}
+  .hero-stats{gap:20px}
+  .stat-item{min-width:100px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="qr-loader">
+    <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="22" y="22" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="90" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="102" y="22" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="10" y="90" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="22" y="102" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="90" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="135" y="90" width="15" height="10" fill="#01f080"/>
+      <rect x="90" y="105" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="105" width="10" height="10" fill="#01f080"/>
+      <rect x="90" y="120" width="25" height="10" fill="#01f080"/>
+      <rect x="120" y="120" width="10" height="10" fill="#01f080"/>
+      <rect x="135" y="120" width="15" height="10" fill="#01f080"/>
+      <rect x="105" y="135" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="135" width="30" height="10" fill="#01f080"/>
+      <rect x="30" y="30" width="20" height="20" fill="#060a07"/>
+      <rect x="110" y="30" width="20" height="20" fill="#060a07"/>
+      <rect x="30" y="110" width="20" height="20" fill="#060a07"/>
+    </svg>
+  </div>
+  <div class="loader-text">Initialising Qrypt</div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="menuClose">✕</button>
+  <a href="#what" onclick="closeMenu()">What is Qrypt</a>
+  <a href="#how" onclick="closeMenu()">How it Works</a>
+  <a href="#pricing" onclick="closeMenu()">Pricing</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" onclick="closeMenu()" style="color:var(--green)">Get Early Access</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Qrypt<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#what">What is Qrypt</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Early Access</a>
+  <div class="nav-hamburger" id="hamburger" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-badge"><div class="badge-dot"></div>Pakistan's First Dynamic Ticketing System</div>
+  <h1 class="hero-headline">Screenshot<br>the ticket.<br><span class="green">We dare you.</span></h1>
+  <p class="hero-sub">Qrypt generates <strong>rotating cryptographic QR codes</strong> that expire every 3 seconds and only work at your venue. Ticket fraud? Mathematically impossible.</p>
+  <div class="hero-btns">
+    <a href="#contact" class="btn-primary">Book a Free Pilot</a>
+    <a href="#how" class="btn-ghost">See How It Works</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><span class="stat-num">3s</span><div class="stat-label">QR Rotation Speed</div></div>
+    <div class="stat-item"><span class="stat-num">0</span><div class="stat-label">Fake Tickets Possible</div></div>
+    <div class="stat-item"><span class="stat-num">Rs.10</span><div class="stat-label">Per Entry Only</div></div>
+    <div class="stat-item"><span class="stat-num">0%</span><div class="stat-label">Commission Charged</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No fake tickets</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Zero commission</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Rs. 10 per entry</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Location locked QR</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Real-time entry tracking</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Works on any phone</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No app download needed</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Concerts - Events - University Fests</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No fake tickets</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Zero commission</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Rs. 10 per entry</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Location locked QR</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Real-time entry tracking</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Works on any phone</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No app download needed</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Concerts - Events - University Fests</div>
+  </div>
+</div>
+
+<!-- WHAT IS QRYPT -->
+<section id="what">
+  <div class="reveal">
+    <span class="section-tag">What is Qrypt</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Ticketing built for<br>Pakistan's reality.</h2>
+  </div>
+  <div class="what-grid reveal">
+    <div class="what-text">
+      <p>Pakistan's event industry loses millions every year to <strong>duplicate tickets, screenshots, and counterfeits</strong>. The current systems — static QR codes, printed passes, clipboard guest lists — were never built for how we actually use our phones.</p>
+      <p>Qrypt is a <strong>web-based smart ticketing platform</strong> that makes every ticket unique to the buyer, tied to their location, and impossible to forward, duplicate, or fake. No expensive hardware. No app download. Just a phone browser.</p>
+      <p>We're starting with <strong>concerts, university fests, corporate events, and functions</strong> across Karachi, Lahore, and Islamabad — and we're charging a fraction of what existing platforms take.</p>
+    </div>
+    <div class="what-visual">
+      <div class="qr-demo">
+        <div class="qr-code-inner">
+          <svg width="150" height="150" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="20" y="20" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="100" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="110" y="20" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="10" y="100" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="20" y="110" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="75" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="90" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="120" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="135" y="75" width="15" height="10" fill="#01f080"/>
+            <rect x="75" y="90" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
+            <rect x="75" y="105" width="25" height="10" fill="#01f080"/>
+            <rect x="105" y="105" width="10" height="10" fill="#01f080"/>
+            <rect x="120" y="105" width="30" height="10" fill="#01f080"/>
+            <rect x="90" y="120" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="120" width="45" height="10" fill="#01f080"/>
+            <rect x="27" y="27" width="16" height="16" fill="#060a07"/>
+            <rect x="117" y="27" width="16" height="16" fill="#060a07"/>
+            <rect x="27" y="117" width="16" height="16" fill="#060a07"/>
+          </svg>
+        </div>
+      </div>
+      <div class="geo-badge"><div class="geo-pulse"></div>In Range — Verified</div>
+      <div class="countdown-ring">
+        <div class="countdown-num" id="countdown-num">3</div>
+        <div class="countdown-label">secs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="how-inner">
+    <div class="reveal">
+      <span class="section-tag">How it Works</span>
+      <div class="line-accent"></div>
+      <h2 class="section-title">Four steps.<br>Zero fraud.</h2>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step-card">
+        <span class="step-num">01</span>
+        <div class="step-icon">🎟️</div>
+        <div class="step-title">Organiser creates event</div>
+        <p class="step-desc">Set up your event in minutes. Define capacity, set a geofence boundary around your venue, and generate your unique event link. No hardware required.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">02</span>
+        <div class="step-icon">📲</div>
+        <div class="step-title">Attendee buys ticket</div>
+        <p class="step-desc">Buyer pays online and receives a personal ticket link. No app download. The ticket lives in their phone browser, tied cryptographically to their account.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">03</span>
+        <div class="step-icon">📍</div>
+        <div class="step-title">Location gets verified</div>
+        <p class="step-desc">When the attendee opens their ticket at the venue, Qrypt checks their GPS location against your geofence. Inside boundary? The live QR activates.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">04</span>
+        <div class="step-icon">🔐</div>
+        <div class="step-title">QR rotates every 3 seconds</div>
+        <p class="step-desc">The QR code changes cryptographically every 3 seconds. Scanner at the gate reads it instantly. Screenshot it, forward it, fake it — all invalid. Entry granted. Fraud blocked.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <span class="section-tag">Features</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Built different.<br><span style="color:var(--green)">Not just different looking.</span></h2>
+  </div>
+  <div class="bento-grid reveal">
+    <div class="bento-card wide">
+      <span class="bento-icon">🔄</span>
+      <div class="bento-title">Rotating <span class="green">Cryptographic</span> QR</div>
+      <p class="bento-desc">Powered by TOTP-grade cryptography — the same algorithm behind Google Authenticator. Every code is mathematically unique, time-bound, and tied to a single person's device. Screenshot it. It's already expired.</p>
+      <div class="bento-bg-text">QR</div>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📍</span>
+      <div class="bento-title"><span class="green">Geofenced</span> Activation</div>
+      <p class="bento-desc">Ticket only goes live when the attendee is physically at your venue. GPS + Wi-Fi fingerprinting for maximum accuracy indoors.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📊</span>
+      <div class="bento-title">Live Entry <span class="green">Dashboard</span></div>
+      <p class="bento-desc">Watch who's entering in real time. Capacity alerts, entry heatmaps, and a full post-event attendance report.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📱</span>
+      <div class="bento-title">No App. <span class="green">No Hardware.</span></div>
+      <p class="bento-desc">Attendees use their phone browser. Your gate staff uses any phone camera to scan. Zero setup costs.</p>
+    </div>
+    <div class="bento-card wide">
+      <span class="bento-icon">⚡</span>
+      <div class="bento-title">Multiple <span class="green">Gate Scanners</span></div>
+      <p class="bento-desc">Run 10 entry points simultaneously from different phones. All synced in real time. No more queues, no more chaos at the gate. Each scan is validated centrally in milliseconds — works even with intermittent venue Wi-Fi.</p>
+      <div class="bento-bg-text">⚡</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="reveal">
+      <span class="section-tag">Pricing</span>
+      <div class="line-accent" style="margin:0 auto 20px;"></div>
+      <h2 class="section-title">No commission.<br>No hidden costs.<br><span style="color:var(--green)">Just Rs. 10 per entry.</span></h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;">Ticketwala takes a cut of every ticket sold. We don't. You pay only when someone walks through the door.</p>
+    </div>
+    <div class="pricing-hero reveal">
+      <div class="pricing-badge">Pay As You Go — No Subscription</div>
+      <div class="price-amount">₨10</div>
+      <span class="price-unit">per verified entry — that's it — nothing else</span>
+      <div class="price-features">
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Zero Commission</strong>Sell tickets at any price. We take Rs.10 per scan, not a % of your revenue.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>No Setup Fee</strong>Create your event, set your boundary, go live. Free to set up.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>No Hidden Costs</strong>No monthly fee. No platform charge. No per-event charge. Just Rs.10 per real entry.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Unlimited Events</strong>Run as many events as you want. Scale from a 50-person open mic to a 5000-person concert.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Real-Time Dashboard</strong>Full entry analytics included for every event at no extra cost.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>First Pilot Free</strong>We'll run your first event completely free. No strings attached.</div></div>
+      </div>
+      <div class="pricing-cta">
+        <a href="#contact" class="btn-primary">Start for Free</a>
+        <a href="#contact" class="btn-ghost">Talk to Us First</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <span class="section-tag">About Qrypt</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Built in Pakistan.<br>For Pakistan.</h2>
+  </div>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>We went to a concert in Karachi and watched three different people walk in with the same screenshotted ticket. The guy at the door had no idea. <strong>That's not a people problem. That's a technology problem.</strong></p>
+      <p>Pakistan has incredible events — underground music nights, massive university fests, comedy shows, food festivals. The culture is there. The audience is there. But the infrastructure is stuck in 2012.</p>
+      <p>We're a team of builders who are <strong>tired of watching event organizers lose money</strong> to broken systems. Qrypt is the platform we wished existed.</p>
+      <p>We're starting in Karachi and Lahore, running our first pilots with university societies and independent event organizers. If you want to be among the first — <strong>DMs are open.</strong></p>
+      <div class="about-tags">
+        <span class="about-tag">🇵🇰 Made in Pakistan</span>
+        <span class="about-tag">🎵 Concerts and Music</span>
+        <span class="about-tag">🎓 University Events</span>
+        <span class="about-tag">🎤 Comedy Nights</span>
+        <span class="about-tag">🍴 Food Festivals</span>
+        <span class="about-tag">🏢 Corporate Functions</span>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="about-stat-grid">
+        <div class="about-stat-card"><span class="num">0%</span><div class="label">Commission on ticket sales</div></div>
+        <div class="about-stat-card"><span class="num">3s</span><div class="label">QR code rotation speed</div></div>
+        <div class="about-stat-card"><span class="num">Inf</span><div class="label">Events you can create</div></div>
+        <div class="about-stat-card"><span class="num">Rs.10</span><div class="label">Total cost per real entry</div></div>
+      </div>
+      <div class="about-quote">
+        <p>"Your event deserves better than a clipboard and a prayer. We built the system that makes ticket fraud mathematically impossible — no expensive hardware, no app downloads, just a smarter way to run events in Pakistan."</p>
+        <div class="author">Qrypt Team, Karachi 🇵🇰</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <span class="section-tag">Contact Us</span>
+      <div class="line-accent"></div>
+      <h2 class="section-title">Ready to run<br><span style="color:var(--green)">your first Qrypt event?</span></h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-top:14px;line-height:1.7;max-width:480px;">First pilot is on us — completely free. Let's run your next event together and show you what zero fraud feels like.</p>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <h3>Let's talk.</h3>
+        <p>We're actively onboarding event organizers in Karachi, Lahore, and Islamabad. Whether you run weekly open mics or large-scale concerts — we want to hear from you.</p>
+        <div class="contact-links">
+          <a href="mailto:hello@qrypt.pk" class="contact-link"><div class="contact-link-icon">✉</div><div class="contact-link-text"><strong>Email us</strong><span>hello@qrypt.pk</span></div></a>
+          <a href="https://wa.me/923302446477" class="contact-link" target="_blank"><div class="contact-link-icon">💬</div><div class="contact-link-text"><strong>WhatsApp</strong><span>+92 330 2446477</span></div></a>
+          <a href="https://instagram.com/qryptpk" class="contact-link" target="_blank"><div class="contact-link-icon">📸</div><div class="contact-link-text"><strong>Instagram</strong><span>@qryptpk</span></div></a>
+          <a href="https://linkedin.com/company/qrypt" class="contact-link" target="_blank"><div class="contact-link-icon">💼</div><div class="contact-link-text"><strong>LinkedIn</strong><span>Qrypt Pakistan</span></div></a>
+        </div>
+      </div>
+      <div class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group"><label>Your Name</label><input type="text" id="f-name" placeholder="Ahmed Khan" required/></div>
+          <div class="form-group"><label>Phone / WhatsApp</label><input type="text" id="f-phone" placeholder="+92 300 0000000" required/></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="you@email.com"/></div>
+        <div class="form-group">
+          <label>Event Type</label>
+          <select id="f-type">
+            <option value="">Select your event type</option>
+            <option>Concert / Music Event</option>
+            <option>University Fest</option>
+            <option>Comedy Night / Open Mic</option>
+            <option>Corporate Function</option>
+            <option>Food Festival</option>
+            <option>Sports Event</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Tell us about your event</label><textarea rows="4" id="f-msg" placeholder="Rough size, location, when it's happening — anything helps us prepare..."></textarea></div>
+        <button class="form-submit" id="formBtn" onclick="submitForm()">Book Free Pilot</button>
+        <div class="form-msg" id="formMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-main">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">Qrypt.</span>
+      <p>Pakistan's first dynamic ticketing system. Rotating QR codes, geofenced access, zero fraud. Built in Karachi for Pakistan's event industry.</p>
+      <div class="footer-social">
+        <a href="https://instagram.com/qryptpk" class="social-btn" target="_blank">📸</a>
+        <a href="https://linkedin.com/company/qrypt" class="social-btn" target="_blank">💼</a>
+        <a href="https://wa.me/923302446477" class="social-btn" target="_blank">💬</a>
+        <a href="https://facebook.com/qryptpk" class="social-btn" target="_blank">👥</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#contact">Careers</a></li>
+        <li><a href="#contact">Press Kit</a></li>
+        <li><a href="#contact">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Solution</h4>
+      <ul>
+        <li><a href="#how">How it Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#contact">Free Pilot</a></li>
+        <li><a href="#contact">Integrations</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Enterprise</h4>
+      <ul>
+        <li><a href="#contact">Enterprise Solutions</a></li>
+        <li><a href="#contact">Contact Sales</a></li>
+        <li><a href="#contact">Custom Pricing</a></li>
+        <li><a href="#contact">API Access</a></li>
+        <li><a href="#contact">White Label</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#contact">Help Center</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+        <li><a href="https://wa.me/923302446477" target="_blank">WhatsApp Support</a></li>
+        <li><a href="#contact">Privacy Policy</a></li>
+        <li><a href="#contact">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Built with purpose in <strong>Karachi, Pakistan 🇵🇰</strong> — Screenshot the ticket. We dare you. 🔐</p>
+    <ul class="footer-bottom-links">
+      <li><a href="#contact">Privacy</a></li>
+      <li><a href="#contact">Terms</a></li>
+      <li><a href="#contact">Cookies</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<div class="wa-float" id="waFloat">
+  <div class="wa-tooltip" id="waTooltip"><div class="wa-online-dot"></div>We're online — Chat with us</div>
+  <a href="https://wa.me/923302446477" class="wa-bubble" target="_blank" title="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+</div>
+
+<script>
+// LOADER
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('loader').classList.add('hidden')},2200)});
+
+// MOBILE MENU
+function openMenu(){document.getElementById('mobileMenu').classList.add('open')}
+function closeMenu(){document.getElementById('mobileMenu').classList.remove('open')}
+document.getElementById('menuClose').onclick=closeMenu;
+
+// COUNTDOWN
+let count=3;
+const countEl=document.getElementById('countdown-num');
+setInterval(()=>{count--;if(count<1)count=3;if(countEl)countEl.textContent=count;},1000);
+
+// SCROLL REVEAL
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80)})},{threshold:0.1});
+reveals.forEach(el=>obs.observe(el));
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{document.querySelector('nav').style.padding=window.scrollY>60?'12px 40px':'18px 40px'});
+
+// WHATSAPP TOOLTIP — hide after 5s
+setTimeout(()=>{const t=document.getElementById('waTooltip');if(t)t.style.display='none';},5000);
+
+// GOOGLE SHEETS FORM SUBMIT
+// IMPORTANT: Replace the URL below with your Google Apps Script Web App URL
+// See setup instructions in the downloaded file
+const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+async function submitForm(){
+  const btn=document.getElementById('formBtn');
+  const msg=document.getElementById('formMsg');
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const type=document.getElementById('f-type').value;
+  const message=document.getElementById('f-msg').value.trim();
+
+  if(!name||!phone){
+    msg.className='form-msg error';
+    msg.textContent='Please fill in your name and phone number.';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent='Sending...';
+  msg.className='form-msg';
+
+  const data={name,phone,email,type,message,timestamp:new Date().toLocaleString('en-PK',{timeZone:'Asia/Karachi'})};
+
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    msg.className='form-msg success';
+    msg.textContent='Received! We will be in touch shortly. 🔐';
+    btn.textContent='Sent!';
+    document.getElementById('f-name').value='';
+    document.getElementById('f-phone').value='';
+    document.getElementById('f-email').value='';
+    document.getElementById('f-type').value='';
+    document.getElementById('f-msg').value='';
+  }catch(e){
+    msg.className='form-msg error';
+    msg.textContent='Something went wrong. Please WhatsApp us directly at +92 330 2446477';
+    btn.disabled=false;
+    btn.textContent='Book Free Pilot';
+  }
+}
+</script>
+</body>
+</html>
