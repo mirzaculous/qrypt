@@ -1,560 +1,739 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qrypt — Pakistan's Smartest Ticketing System</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
-#qrypt *{box-sizing:border-box;margin:0;padding:0;font-family:'DM Sans',sans-serif;}
-#qrypt{background:#0F172A;color:#F1F5F9;min-height:620px;border-radius:12px;overflow:hidden;position:relative;}
-.qbg{background:#22C55E;color:#14532D;border:none;padding:10px 20px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
-.qbg:hover{background:#4ADE80;}
-.qbo{background:transparent;color:#94A3B8;border:1.5px solid #334155;padding:9px 18px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:all 0.15s;}
-.qbo:hover{border-color:#22C55E;color:#22C55E;}
-.qin{width:100%;background:#0F172A;border:1px solid #334155;border-radius:9px;padding:11px 13px;color:#F1F5F9;font-size:14px;font-family:inherit;outline:none;transition:border-color 0.15s;color-scheme:dark;}
-.qin:focus{border-color:#22C55E;}
-.qcard{background:#1E293B;border:1px solid #334155;border-radius:14px;padding:18px;}
-.qlabel{display:block;color:#94A3B8;font-size:12px;font-weight:600;margin-bottom:5px;}
-.qtab{background:none;border:none;border-bottom:2px solid transparent;color:#64748B;font-family:inherit;font-weight:600;font-size:14px;padding:8px 4px;margin-right:18px;cursor:pointer;}
-.qtab.active{border-bottom-color:#22C55E;color:#22C55E;}
-.navitem{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;text-align:left;width:100%;transition:all 0.15s;}
-.navitem.active{background:#22C55E18;color:#22C55E;font-weight:700;}
-.navitem:not(.active){background:transparent;color:#94A3B8;}
-.navitem:not(.active):hover{background:#1E293B;color:#CBD5E1;}
-.evcard{background:#1E293B;border:1px solid #334155;border-radius:13px;overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.15s;}
-.evcard:hover{border-color:#22C55E44;}
-.bgpaid{background:#22C55E18;color:#22C55E;border-radius:100px;font-size:11px;padding:3px 9px;font-weight:700;border:1px solid #22C55E44;}
-.bggreen{background:#22C55E;color:#14532D;border-radius:100px;font-size:11px;padding:3px 9px;font-weight:700;}
-.toast{position:absolute;bottom:16px;right:16px;z-index:9999;border-radius:10px;padding:12px 20px;font-weight:600;font-size:13px;animation:slideUp 0.3s ease;pointer-events:none;}
-.toast.s{background:#22C55E;color:#14532D;}
-.toast.e{background:#EF4444;color:#fff;}
-@keyframes slideUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.45}}
-.pulse{animation:pulse 2.5s infinite;}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
-#scanner-wrap{position:relative;width:260px;height:260px;margin:0 auto;border-radius:16px;overflow:hidden;background:#000;}
-#scanner-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
-.scan-corner{position:absolute;width:28px;height:28px;border-color:#22C55E;border-style:solid;}
-.sc-tl{top:10px;left:10px;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
-.sc-tr{top:10px;right:10px;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
-.sc-bl{bottom:10px;left:10px;border-width:0 0 3px 3px;border-radius:0 0 0 4px;}
-.sc-br{bottom:10px;right:10px;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
-.scan-line{position:absolute;left:16px;right:16px;height:2px;background:#22C55E;opacity:0.8;animation:scanMove 2s ease-in-out infinite;}
-@keyframes scanMove{0%{top:16px}100%{top:calc(100% - 16px)}}
-.result-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:16px;animation:slideUp 0.2s ease;}
+:root{--green:#01f080;--green-dim:#00b85f;--green-glow:rgba(1,240,128,0.15);--green-glow-strong:rgba(1,240,128,0.3);--off-white:#f0f1f1;--bg:#060a07;--bg2:#0c110e;--bg3:#101710;--border:rgba(1,240,128,0.12);--border-strong:rgba(1,240,128,0.3);--text-muted:rgba(240,241,241,0.5);--text-dim:rgba(240,241,241,0.75)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--off-white);font-family:'Space Grotesk',sans-serif;overflow-x:hidden}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity 0.8s ease,visibility 0.8s ease}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.qr-loader{width:100px;height:100px;animation:qr-spin 2s linear infinite}
+@keyframes qr-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.loader-text{font-family:'Syne',sans-serif;font-size:12px;letter-spacing:0.3em;color:var(--green);text-transform:uppercase;animation:pulse-text 1s ease-in-out infinite alternate}
+@keyframes pulse-text{from{opacity:0.4}to{opacity:1}}
+.loader-bar{width:180px;height:1px;background:var(--border);position:relative;overflow:hidden}
+.loader-bar::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--green),transparent);animation:bar-slide 1.2s ease-in-out infinite}
+@keyframes bar-slide{to{left:200%}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(6,10,7,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:padding 0.3s}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);letter-spacing:-0.02em;text-decoration:none}
+.nav-logo span{color:var(--off-white)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{color:var(--text-dim);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--green)}
+.nav-cta{background:var(--green);color:var(--bg);padding:10px 22px;border-radius:4px;font-size:13px;font-weight:700;text-decoration:none;transition:background 0.2s,transform 0.2s;white-space:nowrap}
+.nav-cta:hover{background:#00cc6a;transform:translateY(-1px)}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--off-white);border-radius:2px;transition:all 0.3s}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--off-white);text-decoration:none;transition:color 0.2s}
+.mobile-menu a:hover{color:var(--green)}
+.mobile-close{position:absolute;top:24px;right:24px;font-size:28px;color:var(--text-muted);cursor:pointer;background:none;border:none}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(1,240,128,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(1,240,128,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black 40%,transparent 100%)}
+.hero-orb{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(1,240,128,0.07) 0%,transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(1,240,128,0.08);border:1px solid var(--border-strong);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:600;color:var(--green);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:28px;position:relative}
+.badge-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero-headline{font-family:'Syne',sans-serif;font-size:clamp(42px,8vw,96px);font-weight:800;line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;position:relative}
+.hero-headline .green{color:var(--green)}
+.hero-sub{font-size:clamp(15px,2vw,19px);color:var(--text-muted);max-width:540px;line-height:1.6;margin-bottom:40px;position:relative}
+.hero-sub strong{color:var(--off-white);font-weight:600}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative}
+.btn-primary{background:var(--green);color:var(--bg);padding:15px 32px;border-radius:4px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.2s;border:none;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.btn-primary:hover{background:#00e876;transform:translateY(-2px);box-shadow:0 8px 30px rgba(1,240,128,0.3)}
+.btn-ghost{background:transparent;color:var(--off-white);padding:15px 32px;border-radius:4px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid var(--border-strong);transition:all 0.2s}
+.btn-ghost:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:40px;margin-top:60px;position:relative;padding-top:40px;border-top:1px solid var(--border);flex-wrap:wrap;justify-content:center}
+.stat-item{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,36px);font-weight:800;color:var(--green);display:block}
+.stat-label{font-size:12px;color:var(--text-muted);letter-spacing:0.04em;margin-top:4px}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;background:var(--bg2)}
+.ticker-track{display:flex;animation:ticker-scroll 22s linear infinite;width:max-content}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:flex;align-items:center;gap:14px;padding:0 32px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap}
+.ticker-dot{color:var(--green);font-size:16px}
+
+/* SECTION BASE */
+.section-tag{font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,60px);font-weight:800;line-height:1.05;letter-spacing:-0.02em;margin-bottom:20px}
+.line-accent{width:50px;height:3px;background:var(--green);border-radius:2px;margin-bottom:20px}
+
+/* WHAT */
+#what{padding:100px 40px;max-width:1200px;margin:0 auto}
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-top:50px}
+.what-text p{font-size:16px;line-height:1.8;color:var(--text-dim);margin-bottom:18px}
+.what-text p strong{color:var(--green);font-weight:600}
+.what-visual{display:flex;align-items:center;justify-content:center;position:relative;min-height:280px}
+.qr-demo{width:200px;height:200px;background:var(--bg3);border:1px solid var(--border-strong);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.qr-demo::before{content:'';position:absolute;inset:-2px;background:conic-gradient(from 0deg,transparent,var(--green),transparent);border-radius:14px;animation:qr-border-spin 3s linear infinite;z-index:-1}
+@keyframes qr-border-spin{to{transform:rotate(360deg)}}
+.qr-code-inner{animation:qr-fade 3s ease-in-out infinite}
+@keyframes qr-fade{0%,100%{opacity:1;transform:scale(1)}45%{opacity:0;transform:scale(0.85)}55%{opacity:0;transform:scale(0.85)}}
+.countdown-ring{position:absolute;bottom:-20px;right:-16px;width:72px;height:72px;background:var(--bg2);border:1px solid var(--border-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.countdown-num{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--green);line-height:1}
+.countdown-label{font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase}
+.geo-badge{position:absolute;top:-14px;left:-16px;background:var(--bg2);border:1px solid var(--border-strong);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:6px}
+.geo-pulse{width:7px;height:7px;background:var(--green);border-radius:50%;animation:geo-ping 1.5s ease-out infinite}
+@keyframes geo-ping{0%{box-shadow:0 0 0 0 var(--green-glow-strong)}100%{box-shadow:0 0 0 10px transparent}}
+
+/* HOW */
+#how{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#how::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.how-inner{max-width:1200px;margin:0 auto}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:60px}
+.step-card{background:var(--bg3);padding:30px 24px;position:relative;border:1px solid var(--border);transition:border-color 0.3s,background 0.3s;overflow:hidden}
+.step-card:first-child{border-radius:12px 0 0 12px}
+.step-card:last-child{border-radius:0 12px 12px 0}
+.step-card:hover{border-color:var(--border-strong);background:rgba(1,240,128,0.03)}
+.step-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transition:transform 0.3s;transform-origin:left}
+.step-card:hover::after{transform:scaleX(1)}
+.step-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:rgba(1,240,128,0.07);line-height:1;margin-bottom:14px;display:block}
+.step-icon{width:44px;height:44px;background:var(--green-glow);border:1px solid var(--border-strong);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px}
+.step-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:10px;color:var(--off-white)}
+.step-desc{font-size:13px;line-height:1.7;color:var(--text-muted)}
+
+/* FEATURES */
+#features{padding:100px 40px;max-width:1200px;margin:0 auto}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:60px}
+.bento-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;transition:border-color 0.3s,transform 0.3s;position:relative;overflow:hidden}
+.bento-card:hover{border-color:var(--border-strong);transform:translateY(-4px)}
+.bento-card.wide{grid-column:span 2}
+.bento-icon{font-size:32px;margin-bottom:16px;display:block}
+.bento-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.bento-title .green{color:var(--green)}
+.bento-desc{font-size:13px;line-height:1.7;color:var(--text-muted)}
+.bento-bg-text{position:absolute;bottom:-16px;right:-8px;font-family:'Syne',sans-serif;font-size:80px;font-weight:800;color:rgba(1,240,128,0.03);line-height:1;pointer-events:none;user-select:none}
+
+/* PRICING */
+#pricing{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#pricing::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.pricing-inner{max-width:960px;margin:0 auto;text-align:center}
+.pricing-hero{margin-top:50px;background:var(--bg3);border:1px solid var(--border-strong);border-radius:24px;padding:50px 40px;position:relative;overflow:hidden}
+.pricing-badge{display:inline-block;background:rgba(1,240,128,0.1);border:1px solid var(--border-strong);color:var(--green);font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:28px}
+.price-amount{font-family:'Syne',sans-serif;font-size:clamp(64px,12vw,110px);font-weight:800;color:var(--green);line-height:1;letter-spacing:-0.04em;margin-bottom:8px}
+.price-unit{font-size:17px;color:var(--text-muted);margin-bottom:28px;display:block}
+.price-features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;padding-top:40px;border-top:1px solid var(--border);text-align:left}
+.price-feat{display:flex;align-items:flex-start;gap:10px}
+.price-feat-check{width:20px;height:20px;background:var(--green-glow);border:1px solid var(--border-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:var(--green);margin-top:2px}
+.price-feat-text{font-size:13px;color:var(--text-dim);line-height:1.5}
+.price-feat-text strong{color:var(--off-white);display:block;font-weight:600;font-size:14px;margin-bottom:2px}
+.pricing-cta{margin-top:40px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ABOUT */
+#about{padding:100px 40px;max-width:1200px;margin:0 auto}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-top:50px}
+.about-text p{font-size:16px;line-height:1.8;color:var(--text-dim);margin-bottom:18px}
+.about-text p strong{color:var(--green)}
+.about-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.about-tag{background:rgba(1,240,128,0.06);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500}
+.about-visual{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px}
+.about-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.about-stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:22px}
+.about-stat-card .num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--green);display:block}
+.about-stat-card .label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.about-quote{margin-top:16px;padding:22px;background:var(--bg3);border:1px solid var(--border);border-radius:12px}
+.about-quote p{font-size:13px;color:var(--text-muted);line-height:1.7;font-style:italic}
+.about-quote .author{font-size:13px;color:var(--green);margin-top:10px;font-weight:600}
+
+/* CONTACT */
+#contact{padding:100px 40px;background:var(--bg2);position:relative;overflow:hidden}
+#contact::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.contact-inner{max-width:1000px;margin:0 auto}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:50px}
+.contact-info h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:14px}
+.contact-info p{font-size:15px;line-height:1.7;color:var(--text-muted);margin-bottom:28px}
+.contact-links{display:flex;flex-direction:column;gap:12px}
+.contact-link{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.contact-link:hover{border-color:var(--border-strong);transform:translateX(4px)}
+.contact-link-icon{width:34px;height:34px;background:var(--green-glow);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green);flex-shrink:0}
+.contact-link-text strong{display:block;color:var(--off-white);font-size:13px;font-weight:600}
+.contact-link-text span{font-size:12px;color:var(--text-muted)}
+.contact-form{display:flex;flex-direction:column;gap:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted)}
+.form-group input,.form-group textarea,.form-group select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:13px 14px;color:var(--off-white);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;resize:none;-webkit-appearance:none}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--border-strong);box-shadow:0 0 0 3px var(--green-glow)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(240,241,241,0.2)}
+.form-group select option{background:var(--bg3);color:var(--off-white)}
+.form-submit{background:var(--green);color:var(--bg);border:none;padding:15px 32px;border-radius:8px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;width:100%;letter-spacing:0.02em}
+.form-submit:hover{background:#00e876;transform:translateY(-2px);box-shadow:0 8px 30px rgba(1,240,128,0.3)}
+.form-submit:disabled{opacity:0.7;cursor:not-allowed;transform:none}
+.form-msg{text-align:center;font-size:14px;padding:12px;border-radius:8px;display:none}
+.form-msg.success{display:block;background:rgba(1,240,128,0.1);border:1px solid var(--border-strong);color:var(--green)}
+.form-msg.error{display:block;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);color:#ff8080}
+
+/* BIG FOOTER */
+.footer-main{background:var(--bg);border-top:1px solid var(--border);padding:80px 40px 40px}
+.footer-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:50px;padding-bottom:60px;border-bottom:1px solid var(--border)}
+.footer-brand .logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-bottom:14px;display:block}
+.footer-brand p{font-size:13px;color:var(--text-muted);line-height:1.7;max-width:260px;margin-bottom:20px}
+.footer-social{display:flex;gap:10px}
+.social-btn{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;transition:border-color 0.2s,transform 0.2s}
+.social-btn:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.footer-col h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--off-white);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:18px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul a{font-size:13px;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+.footer-col ul a:hover{color:var(--green)}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding-top:32px;flex-wrap:wrap;gap:16px}
+.footer-bottom p{font-size:12px;color:var(--text-muted)}
+.footer-bottom p strong{color:var(--green)}
+.footer-bottom-links{display:flex;gap:20px;list-style:none}
+.footer-bottom-links a{font-size:12px;color:var(--text-muted);text-decoration:none;transition:color 0.2s}
+.footer-bottom-links a:hover{color:var(--green)}
+
+/* WHATSAPP FLOAT */
+.wa-float{position:fixed;bottom:28px;right:28px;z-index:998;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.wa-bubble{background:#25D366;border-radius:50%;width:58px;height:58px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(37,211,102,0.4);cursor:pointer;text-decoration:none;animation:wa-bounce 3s ease-in-out infinite;transition:transform 0.2s,box-shadow 0.2s}
+.wa-bubble:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(37,211,102,0.6);animation:none}
+@keyframes wa-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.wa-bubble svg{width:30px;height:30px;fill:#fff}
+.wa-tooltip{background:var(--bg2);border:1px solid var(--border-strong);color:var(--off-white);font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;white-space:nowrap;display:flex;align-items:center;gap:6px;animation:wa-fade-in 0.3s ease;pointer-events:none}
+.wa-online-dot{width:7px;height:7px;background:#25D366;border-radius:50%;animation:blink 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes wa-fade-in{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:14px 20px}
+  .nav-links,.nav-cta{display:none}
+  .nav-hamburger{display:flex}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .step-card:first-child{border-radius:12px 0 0 0}
+  .step-card:last-child{border-radius:0 0 12px 0}
+  .step-card:nth-child(2){border-radius:0 12px 0 0}
+  .step-card:nth-child(3){border-radius:0 0 0 12px}
+  .bento-grid{grid-template-columns:1fr 1fr}
+  .bento-card.wide{grid-column:span 2}
+  .what-grid,.about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .what-visual{min-height:200px}
+  .price-features{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .hero-stats{gap:24px}
+}
+@media(max-width:600px){
+  #hero{padding:100px 20px 60px}
+  #what,#features,#about,#contact,#pricing{padding:70px 20px}
+  #how{padding:70px 20px}
+  .steps-grid{grid-template-columns:1fr;gap:2px}
+  .step-card:first-child{border-radius:12px 12px 0 0}
+  .step-card:last-child{border-radius:0 0 12px 12px}
+  .step-card:nth-child(2){border-radius:0}
+  .step-card:nth-child(3){border-radius:0}
+  .bento-grid{grid-template-columns:1fr}
+  .bento-card.wide{grid-column:span 1}
+  .price-features{grid-template-columns:1fr}
+  .pricing-hero{padding:32px 24px}
+  .form-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
+  .footer-main{padding:50px 20px 32px}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:12px}
+  .wa-float{bottom:20px;right:20px}
+  .wa-bubble{width:52px;height:52px}
+  .hero-btns{flex-direction:column;align-items:center}
+  .btn-primary,.btn-ghost{width:100%;max-width:300px;text-align:center}
+  .hero-stats{gap:20px}
+  .stat-item{min-width:100px}
+}
 </style>
+</head>
+<body>
 
-<div id="qrypt"><div id="ar"></div></div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="qr-loader">
+    <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="22" y="22" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="90" y="10" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="102" y="22" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="10" y="90" width="60" height="60" rx="6" fill="none" stroke="#01f080" stroke-width="4"/>
+      <rect x="22" y="102" width="36" height="36" rx="3" fill="#01f080"/>
+      <rect x="90" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="90" width="10" height="10" fill="#01f080"/>
+      <rect x="135" y="90" width="15" height="10" fill="#01f080"/>
+      <rect x="90" y="105" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="105" width="10" height="10" fill="#01f080"/>
+      <rect x="90" y="120" width="25" height="10" fill="#01f080"/>
+      <rect x="120" y="120" width="10" height="10" fill="#01f080"/>
+      <rect x="135" y="120" width="15" height="10" fill="#01f080"/>
+      <rect x="105" y="135" width="10" height="10" fill="#01f080"/>
+      <rect x="120" y="135" width="30" height="10" fill="#01f080"/>
+      <rect x="30" y="30" width="20" height="20" fill="#060a07"/>
+      <rect x="110" y="30" width="20" height="20" fill="#060a07"/>
+      <rect x="30" y="110" width="20" height="20" fill="#060a07"/>
+    </svg>
+  </div>
+  <div class="loader-text">Initialising Qrypt</div>
+  <div class="loader-bar"></div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="menuClose">✕</button>
+  <a href="#what" onclick="closeMenu()">What is Qrypt</a>
+  <a href="#how" onclick="closeMenu()">How it Works</a>
+  <a href="#pricing" onclick="closeMenu()">Pricing</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="#contact" onclick="closeMenu()" style="color:var(--green)">Get Early Access</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Qrypt<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#what">What is Qrypt</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Early Access</a>
+  <div class="nav-hamburger" id="hamburger" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-badge"><div class="badge-dot"></div>Pakistan's First Dynamic Ticketing System</div>
+  <h1 class="hero-headline">Screenshot<br>the ticket.<br><span class="green">We dare you.</span></h1>
+  <p class="hero-sub">Qrypt generates <strong>rotating cryptographic QR codes</strong> that expire every 3 seconds and only work at your venue. Ticket fraud? Mathematically impossible.</p>
+  <div class="hero-btns">
+    <a href="#contact" class="btn-primary">Book a Free Pilot</a>
+    <a href="#how" class="btn-ghost">See How It Works</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><span class="stat-num">3s</span><div class="stat-label">QR Rotation Speed</div></div>
+    <div class="stat-item"><span class="stat-num">0</span><div class="stat-label">Fake Tickets Possible</div></div>
+    <div class="stat-item"><span class="stat-num">Rs.10</span><div class="stat-label">Per Entry Only</div></div>
+    <div class="stat-item"><span class="stat-num">0%</span><div class="stat-label">Commission Charged</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No fake tickets</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Zero commission</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Rs. 10 per entry</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Location locked QR</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Real-time entry tracking</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Works on any phone</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No app download needed</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Concerts - Events - University Fests</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No fake tickets</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Zero commission</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Rs. 10 per entry</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Location locked QR</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Real-time entry tracking</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Works on any phone</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>No app download needed</div>
+    <div class="ticker-item"><span class="ticker-dot">✦</span>Concerts - Events - University Fests</div>
+  </div>
+</div>
+
+<!-- WHAT IS QRYPT -->
+<section id="what">
+  <div class="reveal">
+    <span class="section-tag">What is Qrypt</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Ticketing built for<br>Pakistan's reality.</h2>
+  </div>
+  <div class="what-grid reveal">
+    <div class="what-text">
+      <p>Pakistan's event industry loses millions every year to <strong>duplicate tickets, screenshots, and counterfeits</strong>. The current systems — static QR codes, printed passes, clipboard guest lists — were never built for how we actually use our phones.</p>
+      <p>Qrypt is a <strong>web-based smart ticketing platform</strong> that makes every ticket unique to the buyer, tied to their location, and impossible to forward, duplicate, or fake. No expensive hardware. No app download. Just a phone browser.</p>
+      <p>We're starting with <strong>concerts, university fests, corporate events, and functions</strong> across Karachi, Lahore, and Islamabad — and we're charging a fraction of what existing platforms take.</p>
+    </div>
+    <div class="what-visual">
+      <div class="qr-demo">
+        <div class="qr-code-inner">
+          <svg width="150" height="150" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="20" y="20" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="100" y="10" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="110" y="20" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="10" y="100" width="50" height="50" rx="4" fill="none" stroke="#01f080" stroke-width="3"/>
+            <rect x="20" y="110" width="30" height="30" rx="2" fill="#01f080"/>
+            <rect x="75" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="90" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="120" y="75" width="10" height="10" fill="#01f080"/>
+            <rect x="135" y="75" width="15" height="10" fill="#01f080"/>
+            <rect x="75" y="90" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="90" width="10" height="10" fill="#01f080"/>
+            <rect x="75" y="105" width="25" height="10" fill="#01f080"/>
+            <rect x="105" y="105" width="10" height="10" fill="#01f080"/>
+            <rect x="120" y="105" width="30" height="10" fill="#01f080"/>
+            <rect x="90" y="120" width="10" height="10" fill="#01f080"/>
+            <rect x="105" y="120" width="45" height="10" fill="#01f080"/>
+            <rect x="27" y="27" width="16" height="16" fill="#060a07"/>
+            <rect x="117" y="27" width="16" height="16" fill="#060a07"/>
+            <rect x="27" y="117" width="16" height="16" fill="#060a07"/>
+          </svg>
+        </div>
+      </div>
+      <div class="geo-badge"><div class="geo-pulse"></div>In Range — Verified</div>
+      <div class="countdown-ring">
+        <div class="countdown-num" id="countdown-num">3</div>
+        <div class="countdown-label">secs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="how-inner">
+    <div class="reveal">
+      <span class="section-tag">How it Works</span>
+      <div class="line-accent"></div>
+      <h2 class="section-title">Four steps.<br>Zero fraud.</h2>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step-card">
+        <span class="step-num">01</span>
+        <div class="step-icon">🎟️</div>
+        <div class="step-title">Organiser creates event</div>
+        <p class="step-desc">Set up your event in minutes. Define capacity, set a geofence boundary around your venue, and generate your unique event link. No hardware required.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">02</span>
+        <div class="step-icon">📲</div>
+        <div class="step-title">Attendee buys ticket</div>
+        <p class="step-desc">Buyer pays online and receives a personal ticket link. No app download. The ticket lives in their phone browser, tied cryptographically to their account.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">03</span>
+        <div class="step-icon">📍</div>
+        <div class="step-title">Location gets verified</div>
+        <p class="step-desc">When the attendee opens their ticket at the venue, Qrypt checks their GPS location against your geofence. Inside boundary? The live QR activates.</p>
+      </div>
+      <div class="step-card">
+        <span class="step-num">04</span>
+        <div class="step-icon">🔐</div>
+        <div class="step-title">QR rotates every 3 seconds</div>
+        <p class="step-desc">The QR code changes cryptographically every 3 seconds. Scanner at the gate reads it instantly. Screenshot it, forward it, fake it — all invalid. Entry granted. Fraud blocked.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <span class="section-tag">Features</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Built different.<br><span style="color:var(--green)">Not just different looking.</span></h2>
+  </div>
+  <div class="bento-grid reveal">
+    <div class="bento-card wide">
+      <span class="bento-icon">🔄</span>
+      <div class="bento-title">Rotating <span class="green">Cryptographic</span> QR</div>
+      <p class="bento-desc">Powered by TOTP-grade cryptography — the same algorithm behind Google Authenticator. Every code is mathematically unique, time-bound, and tied to a single person's device. Screenshot it. It's already expired.</p>
+      <div class="bento-bg-text">QR</div>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📍</span>
+      <div class="bento-title"><span class="green">Geofenced</span> Activation</div>
+      <p class="bento-desc">Ticket only goes live when the attendee is physically at your venue. GPS + Wi-Fi fingerprinting for maximum accuracy indoors.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📊</span>
+      <div class="bento-title">Live Entry <span class="green">Dashboard</span></div>
+      <p class="bento-desc">Watch who's entering in real time. Capacity alerts, entry heatmaps, and a full post-event attendance report.</p>
+    </div>
+    <div class="bento-card">
+      <span class="bento-icon">📱</span>
+      <div class="bento-title">No App. <span class="green">No Hardware.</span></div>
+      <p class="bento-desc">Attendees use their phone browser. Your gate staff uses any phone camera to scan. Zero setup costs.</p>
+    </div>
+    <div class="bento-card wide">
+      <span class="bento-icon">⚡</span>
+      <div class="bento-title">Multiple <span class="green">Gate Scanners</span></div>
+      <p class="bento-desc">Run 10 entry points simultaneously from different phones. All synced in real time. No more queues, no more chaos at the gate. Each scan is validated centrally in milliseconds — works even with intermittent venue Wi-Fi.</p>
+      <div class="bento-bg-text">⚡</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-inner">
+    <div class="reveal">
+      <span class="section-tag">Pricing</span>
+      <div class="line-accent" style="margin:0 auto 20px;"></div>
+      <h2 class="section-title">No commission.<br>No hidden costs.<br><span style="color:var(--green)">Just Rs. 10 per entry.</span></h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.7;">Ticketwala takes a cut of every ticket sold. We don't. You pay only when someone walks through the door.</p>
+    </div>
+    <div class="pricing-hero reveal">
+      <div class="pricing-badge">Pay As You Go — No Subscription</div>
+      <div class="price-amount">₨10</div>
+      <span class="price-unit">per verified entry — that's it — nothing else</span>
+      <div class="price-features">
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Zero Commission</strong>Sell tickets at any price. We take Rs.10 per scan, not a % of your revenue.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>No Setup Fee</strong>Create your event, set your boundary, go live. Free to set up.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>No Hidden Costs</strong>No monthly fee. No platform charge. No per-event charge. Just Rs.10 per real entry.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Unlimited Events</strong>Run as many events as you want. Scale from a 50-person open mic to a 5000-person concert.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>Real-Time Dashboard</strong>Full entry analytics included for every event at no extra cost.</div></div>
+        <div class="price-feat"><div class="price-feat-check">✓</div><div class="price-feat-text"><strong>First Pilot Free</strong>We'll run your first event completely free. No strings attached.</div></div>
+      </div>
+      <div class="pricing-cta">
+        <a href="#contact" class="btn-primary">Start for Free</a>
+        <a href="#contact" class="btn-ghost">Talk to Us First</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <span class="section-tag">About Qrypt</span>
+    <div class="line-accent"></div>
+    <h2 class="section-title">Built in Pakistan.<br>For Pakistan.</h2>
+  </div>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>We went to a concert in Karachi and watched three different people walk in with the same screenshotted ticket. The guy at the door had no idea. <strong>That's not a people problem. That's a technology problem.</strong></p>
+      <p>Pakistan has incredible events — underground music nights, massive university fests, comedy shows, food festivals. The culture is there. The audience is there. But the infrastructure is stuck in 2012.</p>
+      <p>We're a team of builders who are <strong>tired of watching event organizers lose money</strong> to broken systems. Qrypt is the platform we wished existed.</p>
+      <p>We're starting in Karachi and Lahore, running our first pilots with university societies and independent event organizers. If you want to be among the first — <strong>DMs are open.</strong></p>
+      <div class="about-tags">
+        <span class="about-tag">🇵🇰 Made in Pakistan</span>
+        <span class="about-tag">🎵 Concerts and Music</span>
+        <span class="about-tag">🎓 University Events</span>
+        <span class="about-tag">🎤 Comedy Nights</span>
+        <span class="about-tag">🍴 Food Festivals</span>
+        <span class="about-tag">🏢 Corporate Functions</span>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="about-stat-grid">
+        <div class="about-stat-card"><span class="num">0%</span><div class="label">Commission on ticket sales</div></div>
+        <div class="about-stat-card"><span class="num">3s</span><div class="label">QR code rotation speed</div></div>
+        <div class="about-stat-card"><span class="num">Inf</span><div class="label">Events you can create</div></div>
+        <div class="about-stat-card"><span class="num">Rs.10</span><div class="label">Total cost per real entry</div></div>
+      </div>
+      <div class="about-quote">
+        <p>"Your event deserves better than a clipboard and a prayer. We built the system that makes ticket fraud mathematically impossible — no expensive hardware, no app downloads, just a smarter way to run events in Pakistan."</p>
+        <div class="author">Qrypt Team, Karachi 🇵🇰</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <span class="section-tag">Contact Us</span>
+      <div class="line-accent"></div>
+      <h2 class="section-title">Ready to run<br><span style="color:var(--green)">your first Qrypt event?</span></h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-top:14px;line-height:1.7;max-width:480px;">First pilot is on us — completely free. Let's run your next event together and show you what zero fraud feels like.</p>
+    </div>
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <h3>Let's talk.</h3>
+        <p>We're actively onboarding event organizers in Karachi, Lahore, and Islamabad. Whether you run weekly open mics or large-scale concerts — we want to hear from you.</p>
+        <div class="contact-links">
+          <a href="mailto:hello@qrypt.pk" class="contact-link"><div class="contact-link-icon">✉</div><div class="contact-link-text"><strong>Email us</strong><span>hello@qrypt.pk</span></div></a>
+          <a href="https://wa.me/923302446477" class="contact-link" target="_blank"><div class="contact-link-icon">💬</div><div class="contact-link-text"><strong>WhatsApp</strong><span>+92 330 2446477</span></div></a>
+          <a href="https://instagram.com/qryptpk" class="contact-link" target="_blank"><div class="contact-link-icon">📸</div><div class="contact-link-text"><strong>Instagram</strong><span>@qryptpk</span></div></a>
+          <a href="https://linkedin.com/company/qrypt" class="contact-link" target="_blank"><div class="contact-link-icon">💼</div><div class="contact-link-text"><strong>LinkedIn</strong><span>Qrypt Pakistan</span></div></a>
+        </div>
+      </div>
+      <div class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group"><label>Your Name</label><input type="text" id="f-name" placeholder="Ahmed Khan" required/></div>
+          <div class="form-group"><label>Phone / WhatsApp</label><input type="text" id="f-phone" placeholder="+92 300 0000000" required/></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="you@email.com"/></div>
+        <div class="form-group">
+          <label>Event Type</label>
+          <select id="f-type">
+            <option value="">Select your event type</option>
+            <option>Concert / Music Event</option>
+            <option>University Fest</option>
+            <option>Comedy Night / Open Mic</option>
+            <option>Corporate Function</option>
+            <option>Food Festival</option>
+            <option>Sports Event</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Tell us about your event</label><textarea rows="4" id="f-msg" placeholder="Rough size, location, when it's happening — anything helps us prepare..."></textarea></div>
+        <button class="form-submit" id="formBtn" onclick="submitForm()">Book Free Pilot</button>
+        <div class="form-msg" id="formMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-main">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">Qrypt.</span>
+      <p>Pakistan's first dynamic ticketing system. Rotating QR codes, geofenced access, zero fraud. Built in Karachi for Pakistan's event industry.</p>
+      <div class="footer-social">
+        <a href="https://instagram.com/qryptpk" class="social-btn" target="_blank">📸</a>
+        <a href="https://linkedin.com/company/qrypt" class="social-btn" target="_blank">💼</a>
+        <a href="https://wa.me/923302446477" class="social-btn" target="_blank">💬</a>
+        <a href="https://facebook.com/qryptpk" class="social-btn" target="_blank">👥</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#contact">Careers</a></li>
+        <li><a href="#contact">Press Kit</a></li>
+        <li><a href="#contact">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Solution</h4>
+      <ul>
+        <li><a href="#how">How it Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#contact">Free Pilot</a></li>
+        <li><a href="#contact">Integrations</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Enterprise</h4>
+      <ul>
+        <li><a href="#contact">Enterprise Solutions</a></li>
+        <li><a href="#contact">Contact Sales</a></li>
+        <li><a href="#contact">Custom Pricing</a></li>
+        <li><a href="#contact">API Access</a></li>
+        <li><a href="#contact">White Label</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#contact">Help Center</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+        <li><a href="https://wa.me/923302446477" target="_blank">WhatsApp Support</a></li>
+        <li><a href="#contact">Privacy Policy</a></li>
+        <li><a href="#contact">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Built with purpose in <strong>Karachi, Pakistan 🇵🇰</strong> — Screenshot the ticket. We dare you. 🔐</p>
+    <ul class="footer-bottom-links">
+      <li><a href="#contact">Privacy</a></li>
+      <li><a href="#contact">Terms</a></li>
+      <li><a href="#contact">Cookies</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<div class="wa-float" id="waFloat">
+  <div class="wa-tooltip" id="waTooltip"><div class="wa-online-dot"></div>We're online — Chat with us</div>
+  <a href="https://wa.me/923302446477" class="wa-bubble" target="_blank" title="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+</div>
+
 <script>
-(function(){
-const EVENTS=[
-  {id:1,name:'SEE Pakistan Expo 2026',venue:'Expo Center Karachi',price:1000,date:'2026-07-12',time:'10:00',desc:"Pakistan's largest annual business & technology exhibition."},
-  {id:2,name:'Karachi Music Festival',venue:'Movenpick Hotel Karachi',price:2500,date:'2026-07-20',time:'19:00',desc:'A curated evening of live music across genres.'},
-  {id:3,name:'TechSummit Karachi 2026',venue:'Pearl Continental Karachi',price:3500,date:'2026-08-05',time:'09:00',desc:'Keynotes, panels & workshops on emerging technology.'},
-  {id:4,name:'HBL PSL Night Out',venue:'National Stadium Karachi',price:800,date:'2026-08-14',time:'20:30',desc:'Live PSL match with premium seating & hospitality.'},
-  {id:5,name:'Karachi Food Carnival',venue:'Beach Luxury Hotel Karachi',price:500,date:'2026-08-22',time:'17:00',desc:'Street food meets fine dining in a carnival atmosphere.'}
-];
-const NAMES=['Fatima Ali','Hassan Naqvi','Amna Sheikh','Tariq Mahmood','Layla Bokhari','Usman Chaudhry'];
+// LOADER
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('loader').classList.add('hidden')},2200)});
 
-let S={
-  screen:'landing',events:[...EVENTS],purchased:[],activeTicket:null,
-  orgTab:'dashboard',visTab:'events',
-  liveCode:gc(),gateLogs:[
-    {id:1,name:'Ahmed Raza',ticket:'T-4821',time:'09:14',ok:true},
-    {id:2,name:'Sara Khan',ticket:'T-4822',time:'09:16',ok:true},
-    {id:3,name:'Bilal Mirza',ticket:'T-4823',time:'09:17',ok:false},
-    {id:4,name:'Zoya Siddiqui',ticket:'T-4824',time:'09:19',ok:true}
-  ],
-  toast:null,scanResult:null,scanInput:'',
-  ticketCode:gc(),ticketProgress:1,
-  publishForm:{name:'',venue:'Expo Center Karachi',price:'1500',date:'',time:'19:00'},
-  orgStats:{tickets:847,revenue:2340000,rate:78},
-  scanning:false,cameraError:null,lastScan:0
-};
+// MOBILE MENU
+function openMenu(){document.getElementById('mobileMenu').classList.add('open')}
+function closeMenu(){document.getElementById('mobileMenu').classList.remove('open')}
+document.getElementById('menuClose').onclick=closeMenu;
 
-let IVS=[];
-let videoEl=null, canvasEl=null, animFrame=null, streamRef=null;
+// COUNTDOWN
+let count=3;
+const countEl=document.getElementById('countdown-num');
+setInterval(()=>{count--;if(count<1)count=3;if(countEl)countEl.textContent=count;},1000);
 
-function gc(){
-  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length:8},()=>c[Math.floor(Math.random()*c.length)]).join('');
-}
-function pkr(n){return 'Rs. '+Number(n).toLocaleString('en-PK');}
-function now_hm(){const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+// SCROLL REVEAL
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80)})},{threshold:0.1});
+reveals.forEach(el=>obs.observe(el));
 
-function clearAll(){IVS.forEach(clearInterval);IVS=[];stopCamera();}
+// NAV SCROLL
+window.addEventListener('scroll',()=>{document.querySelector('nav').style.padding=window.scrollY>60?'12px 40px':'18px 40px'});
 
-function stopCamera(){
-  if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
-  if(streamRef){streamRef.getTracks().forEach(t=>t.stop());streamRef=null;}
-  videoEl=null; canvasEl=null;
-}
+// WHATSAPP TOOLTIP — hide after 5s
+setTimeout(()=>{const t=document.getElementById('waTooltip');if(t)t.style.display='none';},5000);
 
-function showToast(msg,type='s'){
-  S.toast={msg,type};
-  render();
-  setTimeout(()=>{S.toast=null;const el=document.getElementById('ar');if(el){const t=el.querySelector('.toast');if(t)t.remove();}},3000);
-}
+// GOOGLE SHEETS FORM SUBMIT
+// IMPORTANT: Replace the URL below with your Google Apps Script Web App URL
+// See setup instructions in the downloaded file
+const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
-function render(){
-  const ar=document.getElementById('ar');
-  if(!ar)return;
-  if(S.screen==='landing') ar.innerHTML=rLanding();
-  else if(S.screen==='organizer') ar.innerHTML=rOrg();
-  else if(S.screen==='visitor') ar.innerHTML=rVisitor();
-  bind();
-  if(S.toast){
-    const t=document.createElement('div');
-    t.className=`toast ${S.toast.type}`;
-    t.textContent=S.toast.msg;
-    ar.style.position='relative';
-    ar.appendChild(t);
-  }
-  if(S.screen==='organizer'&&S.orgTab==='gate'&&S.scanning) initCamera();
-}
+async function submitForm(){
+  const btn=document.getElementById('formBtn');
+  const msg=document.getElementById('formMsg');
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const type=document.getElementById('f-type').value;
+  const message=document.getElementById('f-msg').value.trim();
 
-function rLanding(){
-  return `<div style="background:#0F172A;min-height:620px;">
-  <nav style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #1E293B;background:#0F172A;position:sticky;top:0;z-index:10;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:32px;height:32px;background:#22C55E;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#0F172A;">Q</div>
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;">Qrypt</span>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button class="qbo" id="goOrg">Organizer Access</button>
-      <button class="qbg" id="goVis">Visitor Portal</button>
-    </div>
-  </nav>
-  <section style="text-align:center;padding:60px 24px 44px;max-width:680px;margin:0 auto;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:#22C55E18;border:1px solid #22C55E44;border-radius:100px;padding:5px 14px;margin-bottom:26px;">
-      <span style="width:7px;height:7px;background:#22C55E;border-radius:50%;display:inline-block;" class="pulse"></span>
-      <span style="color:#22C55E;font-size:12px;font-weight:600;">Live Platform — Karachi, Pakistan</span>
-    </div>
-    <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:40px;line-height:1.05;letter-spacing:-2px;margin-bottom:16px;color:#F8FAFC;">Qrypt: The <span style="color:#22C55E;">Living Ticket.</span></h1>
-    <p style="font-size:15px;color:#94A3B8;line-height:1.7;max-width:460px;margin:0 auto 28px;">Screenshots can't get you in. Every ticket refreshes every 3 seconds — impossible to fake, share, or resell.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="qbg" id="goOrg2" style="font-size:15px;padding:13px 28px;">Create an Event</button>
-      <button class="qbo" id="goVis2" style="font-size:15px;padding:13px 28px;">Browse Events</button>
-    </div>
-  </section>
-  <div style="background:#1E293B;border-top:1px solid #334155;border-bottom:1px solid #334155;padding:22px 24px;">
-    <div style="max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:18px;text-align:center;">
-      ${[['12,400+','Tickets Issued'],['99.8%','Fraud Blocked'],['3 sec','Code Refresh'],['50+','Venues']].map(([v,l])=>`<div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#22C55E;">${v}</div><div style="color:#64748B;font-size:12px;margin-top:3px;">${l}</div></div>`).join('')}
-    </div>
-  </div>
-  <section style="padding:48px 24px;max-width:720px;margin:0 auto;">
-    <div style="text-align:center;margin-bottom:30px;">
-      <p style="color:#22C55E;font-weight:600;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">How It Works</p>
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:26px;letter-spacing:-1px;">Four steps. Zero fraud.</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;">
-      ${[['01','Organizer creates event','Set venue, price, date. Goes live instantly.'],['02','Visitor buys a ticket','Browse, buy — ticket lands in your wallet.'],['03','Ticket stays alive','New QR + code every 3s. Screenshots are worthless.'],['04','Gate scan confirms entry','Camera scans the live QR. Instant grant or deny.']].map(([n,t,b])=>`<div class="qcard"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:#22C55E22;margin-bottom:8px;">${n}</div><h3 style="font-weight:700;font-size:13px;margin-bottom:6px;color:#F1F5F9;">${t}</h3><p style="color:#94A3B8;font-size:12px;line-height:1.6;">${b}</p></div>`).join('')}
-    </div>
-  </section>
-  <div style="padding:16px 24px;border-top:1px solid #1E293B;text-align:center;color:#475569;font-size:12px;">© 2026 Qrypt Technologies · Karachi, Pakistan</div>
-</div>`;}
-
-function rOrg(){
-  const tab=S.orgTab;
-  const icons={dashboard:'⊞',publish:'＋',gate:'⬡',logs:'≡'};
-  let content='';
-
-  if(tab==='dashboard'){
-    content=`<div>
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:18px;">Overview</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px;">
-        ${[['Events',S.events.length,'📅'],['Tickets',S.orgStats.tickets,'🎟'],['Entry Rate',S.orgStats.rate+'%','✓'],['Revenue',pkr(S.orgStats.revenue),'◎']].map(([l,v,i])=>`<div class="qcard"><div style="font-size:16px;margin-bottom:6px;">${i}</div><div style="font-size:18px;font-weight:700;font-family:'Syne',sans-serif;color:#F8FAFC;margin-bottom:2px;">${v}</div><div style="font-size:12px;color:#64748B;">${l}</div></div>`).join('')}
-      </div>
-      <h3 style="font-weight:700;font-size:13px;margin-bottom:12px;color:#94A3B8;">Published Events</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow:auto;">
-        ${S.events.length===0?`<div style="color:#475569;font-size:13px;padding:14px 0;">No events yet.</div>`:S.events.map(e=>`<div class="qcard" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:10px;"><div><div style="font-weight:600;font-size:13px;margin-bottom:2px;">${e.name}</div><div style="font-size:11px;color:#64748B;">${e.venue} · ${e.date}</div></div><div style="text-align:right;flex-shrink:0;margin-left:10px;"><div style="color:#22C55E;font-weight:700;font-size:12px;">${pkr(e.price)}</div><div style="font-size:10px;color:#22C55E88;margin-top:1px;">Live</div></div></div>`).join('')}
-      </div>
-    </div>`;
-  } else if(tab==='publish'){
-    const f=S.publishForm;
-    content=`<div style="max-width:440px;">
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:5px;">Publish Live Event</h2>
-      <p style="color:#64748B;font-size:13px;margin-bottom:22px;">Fill in the details and your event goes live instantly.</p>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div><label class="qlabel">Event Name</label><input class="qin" id="pname" placeholder="e.g. Annual Tech Summit 2026" value="${f.name}"></div>
-        <div><label class="qlabel">Venue</label><select class="qin" id="pvenue">${['Expo Center Karachi','Movenpick Hotel Karachi','Pearl Continental Karachi','National Stadium Karachi','Beach Luxury Hotel Karachi','Marriott Hotel Karachi'].map(v=>`<option${v===f.venue?' selected':''}>${v}</option>`).join('')}</select></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div><label class="qlabel">Price (PKR)</label><input class="qin" id="pprice" type="number" min="100" value="${f.price}"></div>
-          <div><label class="qlabel">Date</label><input class="qin" id="pdate" type="date" value="${f.date}"></div>
-        </div>
-        <div><label class="qlabel">Start Time</label><input class="qin" id="ptime" type="time" value="${f.time}"></div>
-        <button class="qbg" id="doPublish" style="padding:13px;font-size:14px;width:100%;margin-top:4px;">Publish Live Event →</button>
-      </div>
-    </div>`;
-  } else if(tab==='gate'){
-    content=rGate();
-  } else if(tab==='logs'){
-    content=`<div>
-      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:5px;">Gate Ledger</h2>
-      <p style="color:#64748B;font-size:13px;margin-bottom:18px;">Real-time entry attempts — updates every 3 seconds.</p>
-      <div style="display:flex;flex-direction:column;gap:7px;max-height:380px;overflow:auto;">
-        ${S.gateLogs.map(l=>`<div class="qcard" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:10px;border-color:${l.ok?'#22C55E22':'#EF444422'};"><div style="display:flex;align-items:center;gap:9px;"><div style="width:7px;height:7px;border-radius:50%;background:${l.ok?'#22C55E':'#EF4444'};flex-shrink:0;"></div><div><div style="font-weight:600;font-size:13px;">${l.name}</div><div style="font-size:11px;color:#64748B;font-family:monospace;">${l.ticket}</div></div></div><div style="text-align:right;"><div style="font-size:12px;font-weight:600;color:${l.ok?'#22C55E':'#EF4444'};">${l.ok?'Granted':'Denied'}</div><div style="font-size:11px;color:#475569;">${l.time}</div></div></div>`).join('')}
-      </div>
-    </div>`;
+  if(!name||!phone){
+    msg.className='form-msg error';
+    msg.textContent='Please fill in your name and phone number.';
+    return;
   }
 
-  return `<div style="background:#0F172A;min-height:620px;display:flex;flex-direction:column;">
-  <div style="background:#1E293B;border-bottom:1px solid #334155;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:28px;height:28px;background:#22C55E;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:#0F172A;">Q</div>
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;">Qrypt</span>
-      <span style="color:#475569;font-size:12px;">/ Organizer</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:11px;">
-      <div style="display:flex;align-items:center;gap:7px;">
-        <div style="width:26px;height:26px;background:#22C55E22;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22C55E;font-weight:700;font-size:11px;">AA</div>
-        <span style="font-size:12px;font-weight:600;">Ahmed Afzal</span>
-      </div>
-      <button class="qbo" id="goBack" style="padding:6px 13px;font-size:12px;">← Back</button>
-    </div>
-  </div>
-  <div style="display:flex;flex:1;">
-    <div style="width:180px;background:#0D1B2A;border-right:1px solid #1E293B;padding:14px 10px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
-      ${[['dashboard','Overview'],['publish','Publish Event'],['gate','Gate Scanner'],['logs','Gate Ledger']].map(([id,label])=>`<button class="navitem${tab===id?' active':''}" data-tab="${id}">${icons[id]} ${label}</button>`).join('')}
-      <div style="margin-top:auto;padding:12px 10px;background:#1E293B;border-radius:9px;">
-        <div style="font-size:10px;color:#64748B;margin-bottom:5px;">Live gate code</div>
-        <div style="font-family:monospace;font-size:15px;font-weight:700;color:#22C55E;letter-spacing:2px;" class="pulse" id="sideCode">${S.liveCode}</div>
-        <div style="font-size:10px;color:#475569;margin-top:2px;">Refreshes every 3s</div>
-      </div>
-    </div>
-    <div style="flex:1;overflow:auto;padding:22px;">${content}</div>
-  </div>
-</div>`;}
+  btn.disabled=true;
+  btn.textContent='Sending...';
+  msg.className='form-msg';
 
-function rGate(){
-  const scanning=S.scanning;
-  const result=S.scanResult;
-  let resultHtml='';
-  if(result){
-    const ok=result==='granted';
-    resultHtml=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:${ok?'#22C55E':'#7F1D1D'};border-radius:16px;z-index:10;animation:slideUp 0.2s ease;">
-      <div style="font-size:44px;margin-bottom:10px;">${ok?'✅':'❌'}</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;margin-bottom:6px;">${ok?'ACCESS GRANTED':'ACCESS DENIED'}</div>
-      <div style="font-size:12px;color:${ok?'#dcfce7':'#fecaca'};text-align:center;padding:0 20px;">${ok?'Ticket verified · Registered at gate':'Invalid or expired code'}</div>
-    </div>`;
+  const data={name,phone,email,type,message,timestamp:new Date().toLocaleString('en-PK',{timeZone:'Asia/Karachi'})};
+
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    msg.className='form-msg success';
+    msg.textContent='Received! We will be in touch shortly. 🔐';
+    btn.textContent='Sent!';
+    document.getElementById('f-name').value='';
+    document.getElementById('f-phone').value='';
+    document.getElementById('f-email').value='';
+    document.getElementById('f-type').value='';
+    document.getElementById('f-msg').value='';
+  }catch(e){
+    msg.className='form-msg error';
+    msg.textContent='Something went wrong. Please WhatsApp us directly at +92 330 2446477';
+    btn.disabled=false;
+    btn.textContent='Book Free Pilot';
   }
-
-  return `<div style="max-width:400px;">
-    <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:5px;">Gate Scanner</h2>
-    <p style="color:#64748B;font-size:13px;margin-bottom:20px;">Point your camera at the visitor's live ticket QR code to verify their entry in real time.</p>
-    <div id="scanner-wrap">
-      <video id="qvideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;display:block;"></video>
-      <canvas id="qcanvas" style="display:none;"></canvas>
-      <div class="scan-corner sc-tl"></div>
-      <div class="scan-corner sc-tr"></div>
-      <div class="scan-corner sc-bl"></div>
-      <div class="scan-corner sc-br"></div>
-      ${scanning&&!result?'<div class="scan-line"></div>':''}
-      ${!scanning?`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F172A;border-radius:16px;">
-        <div style="font-size:48px;margin-bottom:14px;">📷</div>
-        <div style="font-weight:600;font-size:14px;color:#F1F5F9;margin-bottom:6px;">Camera not active</div>
-        <div style="font-size:12px;color:#64748B;text-align:center;padding:0 24px;margin-bottom:18px;">Start the scanner to read QR codes from visitor tickets</div>
-        <button class="qbg" id="startScan" style="padding:10px 22px;font-size:14px;">Start Camera Scanner</button>
-      </div>`:''}
-      ${resultHtml}
-    </div>
-    ${S.cameraError?`<div style="margin-top:12px;padding:12px 14px;background:#7F1D1D22;border:1px solid #EF444433;border-radius:10px;font-size:12px;color:#FCA5A5;">${S.cameraError}</div>`:''}
-    ${scanning&&!result?`<div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-size:12px;color:#64748B;">Scanning for QR code...</div>
-      <button class="qbo" id="stopScan" style="padding:7px 14px;font-size:12px;">Stop Scanner</button>
-    </div>`:''}
-    <div class="qcard" style="margin-top:16px;">
-      <div style="font-size:12px;font-weight:600;color:#94A3B8;margin-bottom:10px;">Current valid gate code</div>
-      <div style="font-family:monospace;font-size:22px;font-weight:700;color:#22C55E;letter-spacing:4px;padding:10px 14px;background:#0F172A;border-radius:8px;border:1px solid #22C55E33;margin-bottom:10px;" class="pulse" id="gateLiveCode">${S.liveCode}</div>
-      <div style="font-size:11px;color:#64748B;margin-bottom:14px;">This code must match what's encoded in the visitor's QR to grant access.</div>
-      <div style="border-top:1px solid #334155;padding-top:12px;">
-        <div style="font-size:12px;color:#94A3B8;margin-bottom:6px;">Or type the code manually:</div>
-        <div style="display:flex;gap:8px;">
-          <input class="qin" id="manInput" maxlength="8" placeholder="8-char code" value="${S.scanInput}" style="font-family:monospace;font-size:15px;letter-spacing:3px;text-transform:uppercase;flex:1;">
-          <button class="qbg" id="doManScan" style="padding:0 16px;font-size:13px;flex-shrink:0;">Verify</button>
-        </div>
-      </div>
-    </div>
-    <div style="margin-top:12px;padding:12px 14px;background:#1E293B;border-radius:10px;border:1px solid #334155;">
-      <div style="font-size:12px;color:#64748B;">How to test: Open the Visitor Portal, buy a ticket, open it to see the live QR, then scan it here with your camera — or copy the 8-char code and type it in the manual field above.</div>
-    </div>
-  </div>`;}
-
-function rVisitor(){
-  if(S.activeTicket) return rTicket();
-  const tab=S.visTab;
-
-  let content='';
-  if(tab==='events'){
-    content=`<div>
-      <div style="margin-bottom:18px;"><h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:3px;">Upcoming Events in Karachi</h2><p style="color:#64748B;font-size:13px;">Browse live events. All prices in PKR.</p></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;">
-        ${S.events.map(e=>{const paid=S.purchased.find(p=>p.id===e.id);return`<div class="evcard" style="${paid?'border-color:#22C55E44;':''}">
-          <div style="background:#0F172A;padding:14px 16px 12px;border-bottom:1px solid #334155;">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
-              <h3 style="font-weight:700;font-size:13px;line-height:1.3;">${e.name}</h3>
-              ${paid?'<span class="bgpaid" style="flex-shrink:0;">PAID</span>':''}
-            </div>
-          </div>
-          <div style="padding:12px 16px;flex:1;display:flex;flex-direction:column;gap:7px;">
-            <div style="font-size:12px;color:#94A3B8;line-height:1.5;">${e.desc}</div>
-            <div style="font-size:11px;color:#64748B;">📍 ${e.venue}</div>
-            <div style="font-size:11px;color:#64748B;">📅 ${e.date} · ${e.time}</div>
-            <div style="font-size:15px;font-weight:700;color:#22C55E;">${pkr(e.price)}</div>
-            <button class="${paid?'qbo':'qbg'} buybtn" data-id="${e.id}" style="margin-top:auto;padding:9px;width:100%;font-size:12px;${paid?'border-color:#22C55E44;color:#22C55E;':''}">${paid?'View Ticket →':'Buy Now'}</button>
-          </div>
-        </div>`}).join('')}
-      </div>
-    </div>`;
-  } else {
-    const bought=S.purchased;
-    content=`<div>
-      <div style="margin-bottom:18px;"><h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:3px;">My Tickets</h2><p style="color:#64748B;font-size:13px;">Tap any ticket to open the live QR for gate entry.</p></div>
-      ${bought.length===0?`<div style="text-align:center;padding:44px 20px;color:#475569;"><div style="font-size:34px;margin-bottom:12px;">🎟</div><div style="font-size:14px;font-weight:600;margin-bottom:5px;">No tickets yet</div><button class="qbg" id="goBrowse" style="margin-top:16px;padding:10px 22px;font-size:13px;">Browse Events</button></div>`:
-      `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;">
-        ${bought.map(e=>`<div class="qcard opentkt" data-id="${e.id}" style="cursor:pointer;border-color:#22C55E44;position:relative;overflow:hidden;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;"><span class="bggreen">VERIFIED</span><span style="font-size:16px;">🎟</span></div>
-          <h3 style="font-weight:700;font-size:13px;margin-bottom:6px;line-height:1.3;">${e.name}</h3>
-          <div style="font-size:11px;color:#64748B;margin-bottom:2px;">📍 ${e.venue}</div>
-          <div style="font-size:11px;color:#64748B;margin-bottom:12px;">📅 ${e.date} · ${e.time}</div>
-          <div style="border-top:1px dashed #334155;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
-            <div><div style="font-size:10px;color:#64748B;">Holder</div><div style="font-size:12px;font-weight:600;">Mirza Mahad Baig</div></div>
-            <div style="color:#22C55E;font-size:11px;font-weight:600;">Open →</div>
-          </div>
-        </div>`).join('')}
-      </div>`}
-    </div>`;
-  }
-
-  const wc=S.purchased.length;
-  return `<div style="background:#0F172A;min-height:620px;display:flex;flex-direction:column;">
-  <div style="background:#1E293B;border-bottom:1px solid #334155;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:28px;height:28px;background:#22C55E;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;color:#0F172A;">Q</div>
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;">Qrypt</span>
-      <span style="color:#475569;font-size:12px;">/ Visitor Portal</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:11px;">
-      <div style="display:flex;align-items:center;gap:7px;">
-        <div style="width:26px;height:26px;background:#22C55E22;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#22C55E;font-weight:700;font-size:11px;">MM</div>
-        <span style="font-size:12px;font-weight:600;">Mirza Mahad Baig</span>
-      </div>
-      <button class="qbo" id="goBack" style="padding:6px 13px;font-size:12px;">← Back</button>
-    </div>
-  </div>
-  <div style="display:flex;gap:0;padding:14px 22px 0;border-bottom:1px solid #1E293B;">
-    <button class="qtab${tab==='events'?' active':''}" id="tabEvents">Upcoming Events</button>
-    <button class="qtab${tab==='wallet'?' active':''}" id="tabWallet">My Tickets${wc>0?` <span style="background:#22C55E;color:#14532D;border-radius:100px;font-size:10px;padding:1px 7px;font-weight:700;">${wc}</span>`:''}</button>
-  </div>
-  <div style="flex:1;overflow:auto;padding:22px;">${content}</div>
-</div>`;}
-
-function rTicket(){
-  const e=S.activeTicket, p=S.ticketProgress, c=S.ticketCode;
-  const r=82, circ=2*Math.PI*r, dash=circ*p;
-  const seed=c.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
-  const rnd=s2=>{let x=Math.sin(s2)*10000;return x-Math.floor(x);};
-  const cs=19, sz=140, cell=sz/cs;
-  let cells=[];
-  for(let row=0;row<cs;row++){for(let col=0;col<cs;col++){
-    const inF=(row<7&&col<7)||(row<7&&col>11)||(row>11&&col<7);
-    if(!inF&&rnd(seed+row*31+col*17)>0.5) cells.push(`<rect x="${col*cell}" y="${row*cell}" width="${cell}" height="${cell}" fill="#0F172A"/>`);
-  }}
-  const fp=(ox,oy)=>`<rect x="${ox*cell}" y="${oy*cell}" width="${7*cell}" height="${7*cell}" fill="#0F172A"/><rect x="${(ox+1)*cell}" y="${(oy+1)*cell}" width="${5*cell}" height="${5*cell}" fill="#fff"/><rect x="${(ox+2)*cell}" y="${(oy+2)*cell}" width="${3*cell}" height="${3*cell}" fill="#0F172A"/>`;
-
-  return `<div style="background:#0F172A;min-height:620px;display:flex;flex-direction:column;align-items:center;padding:24px 16px;">
-  <div style="max-width:340px;width:100%;">
-    <button class="qbo" id="closeTkt" style="margin-bottom:18px;padding:6px 13px;font-size:12px;">← Back to Wallet</button>
-    <div style="background:#1E293B;border:1px solid #334155;border-radius:20px;overflow:hidden;">
-      <div style="background:#22C55E;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#0F172A;">Qrypt Ticket</div><div style="font-size:10px;color:#14532D;font-weight:600;">Live &amp; Verified</div></div>
-        <span style="font-size:20px;">🎟</span>
-      </div>
-      <div style="padding:20px;">
-        <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:3px;">${e.name}</h2>
-        <div style="font-size:11px;color:#64748B;margin-bottom:2px;">📍 ${e.venue}</div>
-        <div style="font-size:11px;color:#64748B;margin-bottom:18px;">📅 ${e.date} · ${e.time}</div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-          <div style="position:relative;width:168px;height:168px;display:flex;align-items:center;justify-content:center;">
-            <svg width="168" height="168" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
-              <circle cx="84" cy="84" r="${r}" fill="none" stroke="#334155" stroke-width="4"/>
-              <circle cx="84" cy="84" r="${r}" fill="none" stroke="#22C55E" stroke-width="4" stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}" stroke-linecap="round"/>
-            </svg>
-            <div style="background:#fff;border-radius:7px;padding:3px;position:relative;z-index:1;">
-              <svg width="${sz}" height="${sz}" xmlns="http://www.w3.org/2000/svg">
-                <rect width="${sz}" height="${sz}" fill="#fff"/>
-                ${fp(0,0)}${fp(12,0)}${fp(0,12)}
-                ${cells.join('')}
-              </svg>
-            </div>
-          </div>
-          <div style="background:#0F172A;border:1px solid #22C55E44;border-radius:9px;padding:11px 16px;text-align:center;width:100%;">
-            <div style="font-size:10px;color:#64748B;margin-bottom:4px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Verification Code</div>
-            <div style="font-family:monospace;font-weight:700;font-size:24px;color:#22C55E;letter-spacing:5px;margin-bottom:2px;" class="pulse">${c}</div>
-            <div style="font-size:10px;color:#475569;">Refreshes every 3 seconds</div>
-          </div>
-          <div style="width:100%;border:1px solid #334155;border-radius:9px;padding:10px 14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:11px;color:#64748B;">Holder</span><span style="font-size:11px;font-weight:600;">Mirza Mahad Baig</span></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:11px;color:#64748B;">Price</span><span style="font-size:11px;font-weight:600;color:#22C55E;">${pkr(e.price)}</span></div>
-            <div style="display:flex;justify-content:space-between;"><span style="font-size:11px;color:#64748B;">Status</span><span style="font-size:11px;font-weight:600;color:#22C55E;">✓ Secure &amp; Active</span></div>
-          </div>
-          <div style="font-size:11px;color:#475569;text-align:center;line-height:1.6;">Show this screen to gate staff. The QR and code update every 3 seconds — screenshots won't work.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>`;}
-
-function initCamera(){
-  requestAnimationFrame(()=>{
-    videoEl=document.getElementById('qvideo');
-    canvasEl=document.getElementById('qcanvas');
-    if(!videoEl||!canvasEl){S.scanning=false;render();return;}
-    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})
-      .then(stream=>{
-        streamRef=stream;
-        videoEl.srcObject=stream;
-        videoEl.play();
-        videoEl.addEventListener('loadedmetadata',()=>{ scanLoop(); });
-      })
-      .catch(err=>{
-        S.scanning=false;
-        S.cameraError='Camera access denied or not available. Please allow camera permissions and try again. You can still use the manual code entry below.';
-        render();
-      });
-  });
 }
-
-function scanLoop(){
-  if(!S.scanning||!videoEl||!canvasEl){return;}
-  if(videoEl.readyState===videoEl.HAVE_ENOUGH_DATA){
-    canvasEl.width=videoEl.videoWidth;
-    canvasEl.height=videoEl.videoHeight;
-    const ctx=canvasEl.getContext('2d');
-    ctx.drawImage(videoEl,0,0,canvasEl.width,canvasEl.height);
-    const img=ctx.getImageData(0,0,canvasEl.width,canvasEl.height);
-    if(typeof jsQR!=='undefined'){
-      const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
-      if(code&&code.data){
-        const now=Date.now();
-        if(now-S.lastScan>3500){
-          S.lastScan=now;
-          const scanned=code.data.trim().toUpperCase();
-          S.scanResult=scanned===S.liveCode.toUpperCase()?'granted':'denied';
-          const name=NAMES[Math.floor(Math.random()*NAMES.length)];
-          S.gateLogs.unshift({id:now,name,ticket:`T-${Math.floor(Math.random()*9000+1000)}`,time:now_hm(),ok:S.scanResult==='granted'});
-          S.gateLogs=S.gateLogs.slice(0,20);
-          render();
-          setTimeout(()=>{ S.scanResult=null; if(S.screen==='organizer'&&S.orgTab==='gate') render(); initCamera(); },3000);
-          return;
-        }
-      }
-    }
-  }
-  animFrame=requestAnimationFrame(scanLoop);
-}
-
-function startOrgIntervals(){
-  const t=setInterval(()=>{
-    S.liveCode=gc();
-    const now=new Date();
-    const hm=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const nm=NAMES[Math.floor(Math.random()*NAMES.length)];
-    const ok=Math.random()>0.15;
-    S.gateLogs.unshift({id:Date.now(),name:nm,ticket:`T-${Math.floor(Math.random()*9000+1000)}`,time:hm,ok});
-    S.gateLogs=S.gateLogs.slice(0,20);
-    const sc=document.getElementById('sideCode');
-    const glc=document.getElementById('gateLiveCode');
-    if(sc) sc.textContent=S.liveCode;
-    if(glc) glc.textContent=S.liveCode;
-  },3000);
-  IVS.push(t);
-}
-
-let tktStart=Date.now();
-function startTicketInterval(){
-  tktStart=Date.now();
-  const DUR=3000;
-  const t=setInterval(()=>{
-    if(!S.activeTicket){clearInterval(t);return;}
-    const elapsed=(Date.now()-tktStart)%DUR;
-    S.ticketProgress=1-(elapsed/DUR);
-    if(elapsed<120) S.ticketCode=gc();
-    if(S.screen==='visitor'&&S.activeTicket) render();
-  },60);
-  IVS.push(t);
-}
-
-function bind(){
-  const on=(id,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener('click',fn);};
-  on('goOrg',()=>{S.screen='organizer';clearAll();startOrgIntervals();render();});
-  on('goOrg2',()=>{S.screen='organizer';clearAll();startOrgIntervals();render();});
-  on('goVis',()=>{S.screen='visitor';clearAll();render();});
-  on('goVis2',()=>{S.screen='visitor';clearAll();render();});
-  on('goBack',()=>{S.screen='landing';clearAll();S.activeTicket=null;S.scanning=false;S.cameraError=null;render();});
-  on('goBrowse',()=>{S.visTab='events';render();});
-  on('tabEvents',()=>{S.visTab='events';render();});
-  on('tabWallet',()=>{S.visTab='wallet';render();});
-  on('closeTkt',()=>{S.activeTicket=null;clearAll();render();});
-  on('doPublish',()=>handlePublish());
-  on('doManScan',()=>handleManScan());
-  on('startScan',()=>{S.scanning=true;S.cameraError=null;render();});
-  on('stopScan',()=>{S.scanning=false;stopCamera();render();});
-
-  document.querySelectorAll('[data-tab]').forEach(el=>{
-    el.addEventListener('click',()=>{
-      if(S.orgTab==='gate'&&S.scanning) stopCamera();
-      S.orgTab=el.dataset.tab;
-      if(el.dataset.tab!=='gate') S.scanning=false;
-      render();
-    });
-  });
-  document.querySelectorAll('.buybtn').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const id=parseInt(el.dataset.id);
-      const ev=S.events.find(e=>e.id===id);
-      if(!ev)return;
-      if(S.purchased.find(p=>p.id===id)){S.visTab='wallet';render();return;}
-      S.purchased.push(ev);
-      showToast(`Ticket purchased for ${ev.name}!`);
-    });
-  });
-  document.querySelectorAll('.opentkt').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const id=parseInt(el.dataset.id);
-      const ev=S.purchased.find(e=>e.id===id);
-      if(ev){S.activeTicket=ev;startTicketInterval();render();}
-    });
-  });
-  const mi=document.getElementById('manInput');
-  if(mi) mi.addEventListener('input',e=>{S.scanInput=e.target.value;});
-
-  ['pname','pvenue','pprice','pdate','ptime'].forEach((fid,i)=>{
-    const el=document.getElementById(fid);
-    if(el) el.addEventListener('input',e=>{const k=['name','venue','price','date','time'][i];S.publishForm[k]=e.target.value;});
-  });
-}
-
-function handlePublish(){
-  const f=S.publishForm;
-  if(!f.name||!f.date){showToast('Please fill in event name and date.','e');return;}
-  const ev={id:Date.now(),name:f.name,venue:f.venue,price:parseInt(f.price)||1000,date:f.date,time:f.time,desc:`${f.name} at ${f.venue}.`};
-  S.events.unshift(ev);
-  S.publishForm={name:'',venue:'Expo Center Karachi',price:'1500',date:'',time:'19:00'};
-  showToast(`"${ev.name}" published!`);
-  S.orgTab='dashboard';
-  render();
-}
-
-function handleManScan(){
-  const inp=(S.scanInput||'').toUpperCase().trim();
-  if(!inp){showToast('Please enter a code.','e');return;}
-  S.scanResult=inp===S.liveCode?'granted':'denied';
-  const name=NAMES[Math.floor(Math.random()*NAMES.length)];
-  S.gateLogs.unshift({id:Date.now(),name,ticket:`T-${Math.floor(Math.random()*9000+1000)}`,time:now_hm(),ok:S.scanResult==='granted'});
-  S.gateLogs=S.gateLogs.slice(0,20);
-  render();
-  setTimeout(()=>{S.scanResult=null;S.scanInput='';render();},3000);
-}
-
-render();
-})();
 </script>
+</body>
+</html>
